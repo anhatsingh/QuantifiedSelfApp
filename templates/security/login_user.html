@@ -1,53 +1,44 @@
-<!DOCTYPE html>
-<html>
+{% with title="Login" %}{% include "header.html" %}{% endwith %}
 
-<head>
-    <title>Login Page</title>
-</head>
+<h1>Login</h1>
+<form action="/login" method="POST" name="login_user_form">
+    <input id="next" name="next" type="hidden" value="/">
 
-<body>
+    <p>
+        <label for="email">Email Address</label> <input id="email" name="email" required type="text" value="">
 
-    <h1>Login</h1>
-    <form action="/login" method="POST" name="login_user_form">
-        <input id="next" name="next" type="hidden" value="/">
-
-        <p>
-            <label for="email">Email Address</label> <input id="email" name="email" required type="text" value="">
-
-        </p>
+    </p>
 
 
-        <p>
-            <label for="password">Password</label> <input id="password" name="password" required type="password"
-                value="">
+    <p>
+        <label for="password">Password</label> <input id="password" name="password" required type="password"
+            value="">
 
-        </p>
-
-
-        <p>
-            <label for="remember">Remember Me</label> <input id="remember" name="remember" type="checkbox" value="y">
-
-        </p>
+    </p>
 
 
-        <p><input id="next" name="next" type="hidden" value="/"></p>
+    <p>
+        <label for="remember">Remember Me</label> <input id="remember" name="remember" type="checkbox" value="y">
+
+    </p>
 
 
-        <p><input id="submit" name="submit" type="submit" value="Login"></p>
+    <p><input id="next" name="next" type="hidden" value="/"></p>
 
-    </form>
 
-    <h2>Menu</h2>
-    <ul>
-        <li><a href="/login?next=/">Login</a></li>
+    <p><input id="submit" name="submit" type="submit" value="Login"></p>
 
-        <li><a href="/register?next=/">Register</a><br /></li>
+</form>
+
+<h2>Menu</h2>
+<ul>
+    <li><a href="/login?next=/">Login</a></li>
+
+    <li><a href="/register?next=/">Register</a><br /></li>
 
 
 
-    </ul>
+</ul>
 
 
-</body>
-
-</html>
+{% with title="Login" %}{% include "footer.html" %}{% endwith %}

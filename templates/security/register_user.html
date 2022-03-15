@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Register User</title>
-</head>
-
-<body>
-
+{% with title="Register" %}{% include "header.html" %}{% endwith %}
 
     <h1>Register</h1>
     <form action="/register" method="POST" name="register_user_form">
@@ -54,6 +46,4 @@
     </ul>
 
 
-</body>
-
-</html>
+{% with title="Register" %}{% include "footer.html" %}{% endwith %}

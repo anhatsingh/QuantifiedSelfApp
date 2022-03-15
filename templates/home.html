@@ -1,13 +1,26 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Dashboard</title>
-    </head>
-    <body>
-        {% if current_user.is_authenticated %}
-        <h1>
-            Hi logger in user, {{ current_user.username }}
-        </h1>
-        {% endif %}
-    </body>
-</html>
+{% with title=title %}{% include "header.html" %}{% endwith %}
+
+<h1>
+    Hi, {{ current_user.username }}
+</h1>
+
+<table border="1">
+    <tr>
+        <th>Tracker</th>
+        <th>Last Tracked</th>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for i in trackers %}
+    <tr>
+        <td><a href="/tracker/show/{{i['id']}}">{{i['name']}}</a></td>
+        <td>{{i['updated_at']}}</td>
+        <td><a href="/tracker/log/{{i['id']}}">Log Value</a></td>
+        <td>Action: <a href="/tracker/edit/{{i['id']}}">Edit</a>, 
+            <a href="/tracker/delete/{{i['id']}}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<h2><a href="/tracker/add">Add Tracker</a></h2>
+
+{% with title=title %}{% include "footer.html" %}{% endwith %}
