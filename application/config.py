@@ -8,8 +8,19 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class LocalDevelopmentConfig(Config):
+    # database configurations
     SQLITE_DB_DIR = os.path.join(basedir, '../db_directory')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(SQLITE_DB_DIR, 'dev_db.sqlite3')
+    
+    # security configurations
+    SECRET_KEY = os.environ.get('FLASK_SECRET')
+    SECURITY_PASSWORD_HASH = 'bcrypt'
+    SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_SECRET')
+    SECURITY_REGISTERABLE = True
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SECURITY_UNAUTHORIZED_VIEW = None
+
+    # debug application
     DEBUG = True
 
 class ProductionDevelopmentConfig(Config):
