@@ -1,3 +1,4 @@
+from sqlalchemy.sql import func
 from .database import db
 
 
@@ -14,27 +15,29 @@ class Tracker(db.Model):
     description = db.Column(db.String)
     tracker_type = db.Column(db.Integer , db.ForeignKey("tracker_type.id"))
 
-class tracker_log(db.Model):
+class Settings(db.Model):
+    __tablename__ = 'settings'
+    __table_args__ = (
+        db.UniqueConstraint("tracker_id", "value"),
+    )
+    tracker_id = db.Column(db.Integer, db.ForeignKey("tracker.id"), primary_key = True)
+    value = db.Column(db.String, primary_key = True)
+
+class Tracker_log(db.Model):
     __tablename__ = 'tracker_logs'
     id = db.Column(db.Integer,autoincrement = True, primary_key=True)
     tracker_id = db.Column(db.Integer,db.ForeignKey("tracker.id"))
-    timestamp = db.Column(db.datetime)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
     value = db.Column(db.String)
     note = db.Column(db.String)
 
-class login_data(db.Model):
+class Login_data(db.Model):
     __tablename__ = 'login_data'
     username= db.Column(db.String , primary_key = True)
     name = db.Column(db.String)
-    password = db.Column(db.string)
+    password = db.Column(db.String)
 
-class debug_logs(db.Model):
-    __tablename__ = 'debug_logs'
-    id = db.Column(db.Integer,primary_key= True,autoincrement= True)
-    username = db.Column(db.string,db.ForeignKey("login_data.username"))
-    timestamp = db.Column(db.datetime)
-    description = db.column(db.string)
-
-class website(db.Model):
-    name = db.Column(db.string,primary_key=True)
-    value = db.Column(db.string)
+class Website(db.Model):
+    __tablename__ = 'website_data'
+    name = db.Column(db.String,primary_key=True)
+    value = db.Column(db.String)

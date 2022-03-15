@@ -32,14 +32,6 @@ CREATE TABLE website_data (
 	value varchar
 );
 
-CREATE TABLE debug_logs (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	username varchar,
-	timestamp datetime,
-	description varchar,
-    FOREIGN KEY (username) REFERENCES login_data(username)
-);
-
 CREATE TABLE settings (
 	tracker_id integer,
 	value varchar,
