@@ -32,20 +32,18 @@ class Tracker_log(db.Model):
     value = db.Column(db.String(255))
     note = db.Column(db.String(255))
 
-class Roles_Users(db.Model):
-    __tablename__ = 'roles_users'
-    id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('role.id'))
+roles_users = db.Table('roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username= db.Column(db.String(55), unique=True)
+    username= db.Column(db.String(55))
     email = db.Column(db.String(55), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
-    roles = db.relationship('Role', secondary=Roles_Users, backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'role'

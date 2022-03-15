@@ -5,3 +5,4 @@ python-dotenv
 Flask-Security
 email_validator
 bcrypt
+flask-jwt-extended

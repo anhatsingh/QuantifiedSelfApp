@@ -19,6 +19,8 @@ class LocalDevelopmentConfig(Config):
     SECURITY_REGISTERABLE = True
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
+    JWT_SECRET_KEY = os.environ.get('SECURITY_SECRET')
+    WTF_CSRF_ENABLED = False
 
     # debug application
     DEBUG = True

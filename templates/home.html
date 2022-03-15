@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        {% if current_user.is_authenticated %}
+        <h1>
+            Hi logger in user, {{ current_user.username }}
+        </h1>
+        {% endif %}
+    </body>
+</html>
