@@ -17,6 +17,8 @@ class Tracker(db.Model):
     name = db.Column(db.String(100), nullable = False)
     description = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
+    settings = db.relationship('Settings', backref='tracker', cascade="all,delete")
+    ttype = db.relationship('Tracker_type', backref='tracker', cascade="all,delete")
 
 class Settings(db.Model):
     __tablename__ = 'settings'

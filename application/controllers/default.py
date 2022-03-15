@@ -24,6 +24,10 @@ def home_page():
 
 # ========================================================================================================================
 
+
+
+
+
 # =============================================ADD TRACKER PAGE===========================================================
 @app.route('/tracker/add', methods = ['GET', 'POST'])
 @login_required
@@ -111,6 +115,10 @@ def add_tracker():
 
 # =========================================================================================================================
 
+
+
+
+
 # =============================================EDIT TRACKER PAGE===========================================================
 @app.route('/tracker/edit/<int:id>', methods = ['GET', 'POST'])
 @login_required
@@ -127,16 +135,15 @@ def edit_tracker(id):
                 'name': tracker_data.name,
                 'description': tracker_data.description,
                 'user_id': tracker_data.user_id,
-                'settings': ",".join([i.value for i in Settings.query.filter_by(tracker_id=id).all()])
+                'settings': ",".join([i.value for i in tracker_data.settings])
             }
 
-            tracker_type = Tracker_type.query.filter_by(tracker_id=id).all()
             # get datatype of the tracker
-            datatypes = list(set([i.datatype for i in tracker_type]))
+            datatypes = list(set([i.datatype for i in tracker_data.ttype]))
             # set datatype to empty if no type is defined earlier
             data['type'] = datatypes[0] if len(datatypes) > 0 else ''
             # get all the choices of the tracker, replace NULL values with ''
-            data['choices'] = "\n".join([i.value if i.value else '' for i in tracker_type]) if len(datatypes) > 0 else ''
+            data['choices'] = "\n".join([i.value if i.value else '' for i in tracker_data.ttype]) if len(datatypes) > 0 else ''
 
             flash('Opened tracker', 'info')
             return render_template('tracker/add_edit.html', title=f'Edit Tracker {id}', edit_mode=True, tracker=data)
@@ -208,5 +215,33 @@ def edit_tracker(id):
             return redirect(url_for('home_page'))
         else:
             abort(404)
+
+# =========================================================================================================================
+
+
+
+
+# ============================================DELETE TRACKER PAGE==========================================================
+@app.route('/tracker/delete/<int:id>', methods = ['GET'])
+@login_required
+def delete_tracker(id):
+    # check if a tracker with the provided id and made by current user exists or not.
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=id).one_or_none()
+    # if it exists, proceed.
+    if tracker_data:
+        try:            
+            db.session.delete(tracker_data)
+            db.session.commit()
+        except:
+            app.logger.exception(f'Error ocurred while deleting tracker with id {id}')
+            # if any internal error occurs, rollback the database
+            db.session.rollback()
+            flash('Internal error occurred, wasn\'t able to delete tracker', 'error')
+            return redirect(url_for('home_page'))
+        
+        flash('Succesfully deleted tracker', 'success')
+        return redirect(url_for('home_page'))
+    else:
+        abort(404)
 
 # =========================================================================================================================
