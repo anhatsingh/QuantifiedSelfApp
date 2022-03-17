@@ -4,7 +4,8 @@ from flask import current_app as app
 from flask_security import login_required
 import flask_login
 from application.models import *
-from datetime import datetime
+from datetime import datetime, timedelta
+import collections
 
 
 # TODO Multi-Language support
@@ -225,5 +226,89 @@ def delete_tracker(id):
         return redirect(url_for('home_page'))
     else:
         abort(404)
+
+# =========================================================================================================================
+
+# =================================================SHOW TRACKER INFO=======================================================
+@app.route('/tracker/<int:id>/show', methods = ['GET', 'POST'], defaults= {'period': 'w'})
+@app.route('/tracker/<int:id>/show/<string:period>', methods = ['GET', 'POST'])
+@login_required
+def show_tracker_log(id, period):
+    # check if a tracker with the provided id and made by current user exists or not.
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=id).one_or_none()
+    # if it exists, proceed.
+    if tracker_data:
+        datatypes = list(set([i.datatype for i in tracker_data.ttype]))
+        tdata = {
+            'id': tracker_data.id,
+            'name': tracker_data.name,
+            'description': tracker_data.description,
+            'user_id': tracker_data.user_id,
+            'settings': ",".join([i.value for i in tracker_data.settings]),
+            'type': datatypes[0] if len(datatypes) > 0 else '',
+            'choices': {i.id: (i.value.strip() if i.value else '') for i in tracker_data.ttype}
+        }
+        log_data = []
+        chart_data = {}
+        for i in tracker_data.values:
+            this_data = {
+                'id': i.id,
+                'timestamp': i.timestamp,
+                'note': i.note,
+                'value': [tdata['choices'][int(x.value)] for x in i.values] if tdata['type'] == 'ms' else [x.value for x in i.values]
+            }
+            log_data.append(this_data)
+
+            if tdata['type'] == 'ms':                
+                options = list(set(this_data['value']))
+                for i in options:
+                    if i in chart_data:
+                        chart_data[i] += this_data['value'].count(i)
+                    else:
+                        chart_data[i] = this_data['value'].count(i)
+            
+            else:                
+                difference_in_time = datetime.today() - this_data['timestamp']
+                if period == 'w' and difference_in_time.days <= 7:
+                    ts = datetime.strftime(i.timestamp, "%Y-%m-%d")
+                    include = True
+                elif period == 'm' and difference_in_time.days <= 30:
+                    ts = datetime.strftime(i.timestamp, "%Y-%m-%d")                
+                    include = True
+                elif period == 'd' and difference_in_time.days <= 0:
+                    ts = datetime.strftime(i.timestamp, "%H:00")                    
+                    include = True
+                elif period == 'a':
+                    ts = datetime.strftime(i.timestamp, "%Y-%m-%d")
+                    include = True
+                
+                if include:
+                    if ts in chart_data:
+                        chart_data[ts] += int("".join(this_data['value'])) if tdata['type'] == 'integer' else float("".join(this_data['value']))
+                    else:
+                        chart_data[ts] = int("".join(this_data['value'])) if tdata['type'] == 'integer' else float("".join(this_data['value']))
+
+        if tdata['type'] != 'ms':
+            if period == 'w':
+                delta = 7
+                for i in range(delta):
+                    key = datetime.strftime(datetime.today()-timedelta(i), "%Y-%m-%d")
+                    if key not in chart_data:
+                        chart_data[key] = 0
+            elif period == 'm':
+                delta = 30
+                for i in range(delta):
+                    key = datetime.strftime(datetime.today()-timedelta(i), "%Y-%m-%d")
+                    if key not in chart_data:
+                        chart_data[key] = 0
+            elif period == 'd':
+                delta = 24
+                for i in range(delta):
+                    key = datetime.strftime(datetime.today()-timedelta(hours=i), "%H:00")
+                    if key not in chart_data:
+                        chart_data[key] = 0
+        
+        return render_template('tracker/show.html', tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())))
+
 
 # =========================================================================================================================

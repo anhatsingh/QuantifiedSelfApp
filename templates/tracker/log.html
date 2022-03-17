@@ -19,7 +19,7 @@
     <p>
         Select the Options:<br />
     {% for i in tracker['choices'] %}
-        <input type="checkbox" id="lchoice{{i}}" name="lchoice" value="{{i}}" {% if edit_mode %}{% if log["value"] == i %}selected{% endif %}{% endif %}>
+        <input type="checkbox" id="lchoice{{i}}" name="lchoice" value="{{i}}" {% if edit_mode %}{% if i|string in log['value'] %}checked{% endif %}{% endif %}>
         <label for="lchoice{{i}}"> {{tracker['choices'][i]}}</label><br>
     {% endfor %}
     </p>

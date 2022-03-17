@@ -2,6 +2,10 @@
 <html>
     <head>
         <title>{{title}}</title>
+        <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/raphael.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/morris.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/custom.js')}}"></script>
     </head>
     <body>
 {% with messages = get_flashed_messages(with_categories=true) %}

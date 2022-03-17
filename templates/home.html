@@ -13,7 +13,7 @@
     </tr>
     {% for i in trackers %}
     <tr>
-        <td><a href="/tracker/{{i['id']}}/show">{{i['name']}}</a></td>
+        <td><a href="/tracker/{{i['id']}}/show/w">{{i['name']}}</a></td>
         <td>{{i['updated_at']}}</td>
         <td><a href="/tracker/{{i['id']}}/log/add">Log Value</a></td>
         <td>Action: <a href="/tracker/{{i['id']}}/edit">Edit</a>, 

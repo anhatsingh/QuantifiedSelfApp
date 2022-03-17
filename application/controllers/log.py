@@ -42,7 +42,7 @@ def add_tracker_log(id):
                 
                 try:
                     if data['type'] == 'ms':
-                        choices = request.form['lchoice']
+                        choices = request.form.getlist('lchoice')
                         for i in choices:
                             x = Tracker_log_value(log_id = log.id, value = i)
                             db.session.add(x)                    
@@ -60,8 +60,7 @@ def add_tracker_log(id):
                     return redirect(url_for('add_tracker_log', id=id))
 
                 flash('Succesfully Saved tracker log', 'success')
-                # TODO change to show_log page
-                return redirect(url_for('home_page'))
+                return redirect(url_for('show_tracker_log', id=id))
             else:
                 abort(404)
     
@@ -88,14 +87,14 @@ def edit_tracker_log(tracker_id, log_id):
                 'user_id': tracker_data.user_id,
                 'settings': ",".join([i.value for i in tracker_data.settings]),
                 'type': datatypes[0] if len(datatypes) > 0 else '',
-                'choices': {i.id: (i.value if i.value else '') for i in tracker_data.ttype}
+                'choices': {i.id: (i.value.strip() if i.value else '') for i in tracker_data.ttype}
             }
 
             ldata = {
                 'id': log_data.id,
                 'timestamp': log_data.timestamp,
                 'note': log_data.note,
-                'value': [i.value for i in log_data.values] 
+                'value': [i.value for i in log_data.values]
             }
 
             if request.method == 'GET':
@@ -111,7 +110,7 @@ def edit_tracker_log(tracker_id, log_id):
                             db.session.delete(i)
 
                         if tdata['type'] == 'ms':
-                            choices = request.form['lchoice']
+                            choices = request.form.getlist('lchoice')
                             for i in choices:
                                 x = Tracker_log_value(log_id = log_data.id, value = i)
                                 db.session.add(x)
@@ -126,12 +125,10 @@ def edit_tracker_log(tracker_id, log_id):
                         # if any internal error occurs, rollback the database
                         db.session.rollback()
                         flash('Internal error occurred, wasn\'t able to update tracker log value', 'error')
-                        # TODO redirect to show_tracker page
-                        return redirect(url_for('home_page'))
+                        return redirect(url_for('show_tracker_log', id=tracker_id))
                     
                     flash('Succesfully updated tracker log', 'success')
-                    # TODO change to show_log page
-                    return redirect(url_for('home_page'))
+                    return redirect(url_for('show_tracker_log', id=tracker_id))
                 else:
                     abort(404)
         else:
@@ -163,8 +160,7 @@ def delete_tracker_log(tracker_id, log_id):
                 return redirect(url_for('home_page'))
         
             flash('Succesfully deleted tracker log', 'success')
-            # TODO Redirect to show_log page
-            return redirect(url_for('home_page'))
+            return redirect(url_for('show_tracker_log', id=tracker_id))
         else:
             abort(404)
     else:

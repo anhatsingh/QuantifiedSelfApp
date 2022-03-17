@@ -1,0 +1,67 @@
+{% with title=title %}{% include "header.html" %}{% endwith %}
+<h1>{{tracker['name']}} - Tracker</h1>
+
+{% if tracker['type'] == 'ms' %}
+{% for i in chart %}
+<div id="myfirstchart{{loop.index}}" style="height: 250px;"></div>
+{% endfor %}
+{% endif %}
+
+{% if tracker['type'] != 'ms' %}
+    <br />
+    <br />
+    <h4>Period</h4>
+    <select name = 'period' id = 'period' data-id="{{tracker['id']}}">
+        <option value="w" {% if period == 'w'%} selected {% endif %}>Last 7 days</option>
+        <option value="m" {% if period == 'm'%} selected {% endif %}>Last 30 days</option>
+        <option value="d" {% if period == 'd'%} selected {% endif %}>Today</option>
+        <option value="a" {% if period == 'a'%} selected {% endif %}>All</option>
+    </select>
+{% endif %}
+
+<h1>Logs</h1>
+<table border="1">
+    <tr>
+        <th>Date-Time</th>
+        <th>Value</th>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for log in logs %}
+    <tr>
+        <td>{{log['timestamp']}}</td>
+        <td>{% for i in log['value'] %}{{i}}<br>{% endfor %}</td>
+        <td>{{log['note']}}</td>
+        <td><a href="{{url_for('edit_tracker_log', tracker_id=tracker['id'], log_id=log['id'])}}">Edit</a>, 
+            <a href="{{url_for('delete_tracker_log', tracker_id=tracker['id'], log_id=log['id'])}}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+<script>
+    window.onload = function(){
+        {% if tracker['type'] != 'ms' %}
+        create_line_chart('myfirstchart', [
+            {% for i in chart %}{ the_d: '{{i}}', value: {{chart[i]}} },
+            {% endfor %}
+        ], 'the_d', ['value'], ['Values']);
+        
+        {% elif tracker['type'] == 'ms' %}
+        {% for i in chart %}
+        create_donut_chart('myfirstchart{{loop.index}}', [
+            { label: '{{i}}', value: {{chart[i]}} },
+            { label: 'Not {{i}}', value: {{total - chart[i]}} }
+        ]);
+        {% endfor %}
+        {% endif %}
+    }
+    
+    const period = document.getElementById('period')
+    period.onchange = function(){
+        window.location = '/tracker/' + period.dataset.id + '/show/' + period.value
+    }
+</script>
+
+
+{% with title=title %}{% include "footer.html" %}{% endwith %}
