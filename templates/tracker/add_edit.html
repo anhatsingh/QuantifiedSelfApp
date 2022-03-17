@@ -3,7 +3,7 @@
 <h1>{% if edit_mode %}Edit{% else %}Add{% endif %} Tracker</h1>
 
 {% if edit_mode %}
-<form action="/tracker/edit/{{tracker['id']}}" method="POST" name="edit_tracker_form">
+<form action="/tracker/{{tracker['id']}}/edit" method="POST" name="edit_tracker_form">
 {% else %}
 <form action="/tracker/add" method="POST" name="add_tracker_form">
 {% endif %}

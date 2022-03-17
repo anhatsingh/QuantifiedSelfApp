@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS role;
 DROP TABLE IF EXISTS roles_users;
-DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS tacker_settings;
+DROP TABLE IF EXISTS tracker_log_value;
 DROP TABLE IF EXISTS tracker_logs;
 DROP TABLE IF EXISTS tracker_type;
 DROP TABLE IF EXISTS tracker;
@@ -21,7 +22,7 @@ CREATE TABLE roles_users (
 	FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
-CREATE TABLE settings (
+CREATE TABLE tracker_settings (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	tracker_id integer NOT NULL,
 	value varchar(255) NOT NULL,
@@ -56,9 +57,15 @@ CREATE TABLE tracker_logs (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	tracker_id integer NOT NULL,
 	timestamp datetime NOT NULL,
-	value varchar(255) NOT NULL,
 	note varchar(255),
     FOREIGN KEY (tracker_id) REFERENCES tracker(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tracker_log_value (
+	id integer PRIMARY KEY AUTOINCREMENT,
+	log_id integer NOT NULL,
+	value varchar(50),
+	FOREIGN KEY (log_id) REFERENCES tracker_logs(id) ON DELETE CASCADE
 );
 
 CREATE TABLE website_data (

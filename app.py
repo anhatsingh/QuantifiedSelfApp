@@ -50,6 +50,10 @@ app = create_app()
 
 # import default controllers
 from application.controllers.default import *
+# import controllers related to trackers
+from application.controllers.tracker import *
+# import controllers related to logging of trackers
+from application.controllers.log import *
 # import api controllers
 from application.controllers.api import *
 # import error handling controllers
