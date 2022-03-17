@@ -1,11 +1,7 @@
 {% with title=title %}{% include "header.html" %}{% endwith %}
 <h1>{{tracker['name']}} - Tracker</h1>
 
-{% if tracker['type'] == 'ms' %}
-{% for i in chart %}
-<div id="myfirstchart{{loop.index}}" style="height: 250px;"></div>
-{% endfor %}
-{% endif %}
+<div id="myfirstchart1" style="width:700px;height: auto;"></div>
 
 {% if tracker['type'] != 'ms' %}
     <br />
@@ -42,18 +38,19 @@
 <script>
     window.onload = function(){
         {% if tracker['type'] != 'ms' %}
-        create_line_chart('myfirstchart', [
+        create_line_chart('myfirstchart1', [
             {% for i in chart %}{ the_d: '{{i}}', value: {{chart[i]}} },
             {% endfor %}
         ], 'the_d', ['value'], ['Values']);
         
         {% elif tracker['type'] == 'ms' %}
-        {% for i in chart %}
-        create_donut_chart('myfirstchart{{loop.index}}', [
-            { label: '{{i}}', value: {{chart[i]}} },
-            { label: 'Not {{i}}', value: {{total - chart[i]}} }
+        
+        create_bar_chart('myfirstchart1', [
+            {% for i in chart %}
+                { y: '{{i}}', a: {{chart[i]}} },
+            {% endfor %}
         ]);
-        {% endfor %}
+        
         {% endif %}
     }
     

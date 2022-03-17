@@ -17,12 +17,13 @@ function create_line_chart(name, chart_data, xkey, ykeys, labels){
 }
 
 
-function create_donut_chart(name, chart_data){
-    new Morris.Donut({
+function create_bar_chart(name, chart_data){
+    new Morris.Bar({
         // ID of the element in which to draw the chart.
         element: name,
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data: chart_data
+        data: chart_data,
+        xkey: 'y',
+        ykeys: ['a'],
+        labels: ['Series A']
       });
 }
