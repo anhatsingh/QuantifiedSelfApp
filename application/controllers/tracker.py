@@ -20,6 +20,7 @@ def add_tracker():
         return render_template('tracker/add_edit.html', title='Add Tracker')
     else:
         # TODO validation of input data
+        # TODO Add tracker choice - time duration
         try:
             # get the new tracker's object
             new_tracker = Tracker(name = request.form['tname'], description = request.form['tdescription'], user_id=flask_login.current_user.id)

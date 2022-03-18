@@ -1,0 +1,14 @@
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.icon-right {
+    float: right;
+    margin-top: 2px;
+    margin-right: -6px;
+}
+
+.page-head{
+    margin:20px;
+}

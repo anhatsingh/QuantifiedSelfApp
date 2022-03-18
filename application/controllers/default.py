@@ -20,7 +20,7 @@ def home_page():
         updated_at = Tracker_log.query.filter_by(tracker_id=i.id).order_by(Tracker_log.timestamp.desc()).all()
         updated_at = updated_at[0].timestamp if updated_at else "Never"
         # add the info gathered to the list of trackers above.
-        trackers.append({'id': i.id, 'name': i.name, 'updated_at': updated_at})
-    return render_template('home.html', title='test', trackers = trackers)
+        trackers.append({'id': i.id, 'name': i.name, 'description': i.description, 'updated_at': updated_at})
+    return render_template('home.html', title='Home Page', trackers = trackers)
 
 # ========================================================================================================================

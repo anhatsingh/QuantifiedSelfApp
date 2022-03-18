@@ -27,3 +27,12 @@ function create_bar_chart(name, chart_data){
         labels: ['Series A']
       });
 }
+
+
+window.onload = function(){
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+
+}
