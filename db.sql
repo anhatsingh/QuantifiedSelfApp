@@ -32,7 +32,7 @@ CREATE TABLE tracker_settings (
 CREATE TABLE user (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	username varchar(55) NOT NULL,
-	email varchar(55) NOT NULL,
+	email varchar(55) NOT NULL UNIQUE,
 	password varchar(255) NOT NULL,
 	active integer NOT NULL
 );
@@ -66,9 +66,4 @@ CREATE TABLE tracker_log_value (
 	log_id integer NOT NULL,
 	value varchar(50),
 	FOREIGN KEY (log_id) REFERENCES tracker_logs(id) ON DELETE CASCADE
-);
-
-CREATE TABLE website_data (
-	name varchar(55) NOT NULL PRIMARY KEY,
-	value varchar(255) NOT NULL
 );

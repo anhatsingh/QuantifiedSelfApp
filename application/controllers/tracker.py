@@ -192,6 +192,8 @@ def edit_tracker(id):
                                 if new_value != '':
                                     x.value = new_value
                                 else:
+                                    vals = db.delete(Tracker_log_value).where(Tracker_log_value.value.in_([x.id]))                                    
+                                    db.session.execute(vals)
                                     db.session.delete(x)
                             
                             # if newly added choices.

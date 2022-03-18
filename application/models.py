@@ -60,8 +60,3 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key = True)
     name = db.Column(db.String(55), unique = True, nullable = False)
     description = db.Column(db.String(255), nullable = False)
-
-class Website(db.Model):
-    __tablename__ = 'website_data'
-    name = db.Column(db.String(55),primary_key=True)
-    value = db.Column(db.String(255), nullable = False)
