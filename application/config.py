@@ -21,6 +21,7 @@ class LocalDevelopmentConfig(Config):
     SECURITY_UNAUTHORIZED_VIEW = None
     JWT_SECRET_KEY = os.environ.get('SECURITY_SECRET')
     WTF_CSRF_ENABLED = False
+    JSON_SORT_KEYS = False
 
     # debug application
     DEBUG = True

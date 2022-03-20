@@ -129,7 +129,7 @@ def add_tracker_log(id):
 @app.route('/tracker/<int:tracker_id>/log/<int:log_id>/edit', methods = ['GET', 'POST'])
 @login_required
 def edit_tracker_log(tracker_id, log_id):
-    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=tracker_id).one_or_none()    
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=tracker_id).one_or_none()
     if tracker_data:
         log_data = Tracker_log.query.filter_by(tracker_id=tracker_data.id, id=log_id).one_or_none()
         if log_data:

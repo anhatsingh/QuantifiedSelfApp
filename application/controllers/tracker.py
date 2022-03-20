@@ -94,7 +94,7 @@ def add_tracker():
                 tchoices = request.form['tchoices'].strip().split('\n')
                 # add each choice to the database
                 for i in tchoices:
-                    new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i)
+                    new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i.strip())
                     db.session.add(new_choice)
             
             # if tracker type is integer values
