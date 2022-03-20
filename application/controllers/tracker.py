@@ -3,12 +3,37 @@ from flask import render_template
 from flask import current_app as app
 from flask_security import login_required
 import flask_login
+from flask_wtf import FlaskForm
+from wtforms import (StringField, TextAreaField, SelectField, HiddenField)
+from wtforms.validators import InputRequired, Length, AnyOf, ValidationError
 from application.models import *
 from datetime import datetime, timedelta
 import collections
 
 
 # TODO Multi-Language support
+
+# ===============================================TRACKER VALIDATION==========================================================
+
+form_tracker_types = ['ms', 'integer', 'float']
+
+def check_tid(form, field):
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=form.tid.data).one_or_none()
+    if not tracker_data:
+        raise ValidationError("Don't mess around with Tracker ID")
+
+class Add_Tracker_Form(FlaskForm):
+    tname = StringField('Tracker Name', validators=[InputRequired(), Length(min=5, max=55)])
+    tdescription = TextAreaField('Tracker Description', validators=[Length(max=255)])
+    ttype = SelectField('Tracker Type', choices=form_tracker_types, validators=[InputRequired(), AnyOf(form_tracker_types, message='Invalid Type supplied')])
+    tchoices = TextAreaField('Multi Select choices')
+    tsettings = StringField('Tracker Settings', validators=[InputRequired()])
+
+class Edit_Tracker_Form(Add_Tracker_Form):
+    tid = HiddenField('Current Tracker ID', validators = [InputRequired(), check_tid])
+    oldtype = HiddenField('Old Tracker Type', validators = [InputRequired(), AnyOf(form_tracker_types, message="Old validator is of invalid type")])
+
+# ========================================================================================================================
 
 
 # =============================================ADD TRACKER PAGE===========================================================
@@ -19,8 +44,11 @@ def add_tracker():
     if request.method == 'GET':
         return render_template('tracker/add_edit.html', title='Add Tracker')
     else:
-        # TODO validation of input data
+        add_form = Add_Tracker_Form()
         # TODO Add tracker choice - time duration
+        if not add_form.validate_on_submit():
+            flash('Validation error occurred while adding tracker', 'error')
+            return render_template('tracker/add_edit.html', title='Add Tracker', form=add_form, retry=True)
         try:
             # get the new tracker's object
             new_tracker = Tracker(name = request.form['tname'], description = request.form['tdescription'], user_id=flask_login.current_user.id)
@@ -131,8 +159,12 @@ def edit_tracker(id):
             return render_template('tracker/add_edit.html', title=f'Edit Tracker {id}', edit_mode=True, tracker=data)
                 
         else:
-            # TODO Add form validation        
+            edit_form = Edit_Tracker_Form()
             # if it exists, proceed. Additionally also check if tracker url id and form hidden field id matches or not.
+            if not edit_form.validate_on_submit():
+                flash('Validation error occurred while editing tracker', 'error')
+                return render_template('tracker/add_edit.html', form=edit_form, retry=True, title=f'Edit Tracker {id}', edit_mode=True, tracker=data)
+
             if id == int(request.form['tid']):
                 try:
                     # update values of tracker

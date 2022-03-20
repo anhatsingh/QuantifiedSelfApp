@@ -1,17 +1,66 @@
 from flask import Flask, request, redirect, url_for, flash, abort
 from flask import render_template
 from flask import current_app as app
+from flask_wtf import FlaskForm
+from wtforms import (StringField, TextAreaField, SelectField, HiddenField, DateTimeField, IntegerField)
+from wtforms.validators import InputRequired, Length, AnyOf, ValidationError
 from flask_security import login_required
 import flask_login
 from application.models import *
 from datetime import datetime
 
-# ===============================================ADD TRACKER LOG ==========================================================
+# based on date we get from JavaScript, DO NOT CHANGE
+date_format = '%m/%d/%Y, %I:%M:%S %p'
+
+
+# ===============================================LOG VALIDATION==========================================================
+
+def check_tracker_id_exists(form, field):
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=form.tid.data).one_or_none()
+    if not tracker_data:
+        raise ValidationError("Don't mess around with Tracker ID")
+
+def check_log_id_exists(form, field):
+    check_tracker_id_exists(form, field)
+    log_data = Tracker_log.query.filter_by(tracker_id=form.tid.data, id=form.lid.data).one_or_none()
+    if not log_data:
+        raise ValidationError("Don't mess around with Log ID")
+
+def lvalue_check(form, field):
+    if field:
+            check_tracker_id_exists(form, field)
+            tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=form.tid.data).one_or_none()
+            datatype = list(set([i.datatype for i in tracker_data.ttype]))
+            datatype = datatype[0] if len(datatype) > 0 else ''
+
+            if datatype == 'integer':
+                try:
+                    int(field.data)
+                except:
+                    raise ValidationError('Numerical Value Field must be Integer')
+            elif datatype == 'float':
+                try:
+                    float(field.data)
+                except:
+                    raise ValidationError('Numerical Value Field must be Float')
+
+class Add_Log_Form(FlaskForm):
+    ldate = DateTimeField('Timestamp', format=date_format, validators=[InputRequired()])
+    tid = HiddenField("Tracker ID", validators=[InputRequired(), check_tracker_id_exists])
+    lvalue = StringField("Value", validators=[lvalue_check])
+    lnote = TextAreaField("Note", validators=[Length(max=255)])
+
+class Edit_Log_Form(Add_Log_Form):
+    lid = HiddenField("Log ID", validators=[InputRequired(), check_log_id_exists])
+
+# =========================================================================================================================
+
+
+# ===============================================ADD TRACKER LOG===========================================================
 
 @app.route('/tracker/<int:id>/log/add', methods = ['GET', 'POST'])
 @login_required
 def add_tracker_log(id):
-    # TODO Form validation
     tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=id).one_or_none()
     if tracker_data:
         datatypes = list(set([i.datatype for i in tracker_data.ttype]))
@@ -28,6 +77,11 @@ def add_tracker_log(id):
         if request.method == 'GET':
             return render_template('tracker/log.html', tracker=data)
         else:
+            add_form = Add_Log_Form()
+            if not add_form.validate_on_submit():
+                flash('Validation error occurred while logging tracker', 'error')
+                return render_template('tracker/log.html', title='Log Tracker', form=add_form, retry=True, tracker=data, date_format=date_format)
+
             if request.form['tid'] == str(id):
                 try:
                     log = Tracker_log(tracker_id = tracker_data.id, note = request.form['lnote'], timestamp = datetime.strptime(request.form['ldate'], '%m/%d/%Y, %I:%M:%S %p'))
@@ -49,7 +103,7 @@ def add_tracker_log(id):
                         db.session.commit()
                     
                     else:
-                        x = Tracker_log_value(log_id = log.id, value = request.form['lvalue'])
+                        x = Tracker_log_value(log_id = log.id, value = int(request.form['lvalue']) if data['type'] == 'integer' else float(request.form['lvalue']))
                         db.session.add(x)
                         db.session.commit()
                 except:
@@ -70,7 +124,7 @@ def add_tracker_log(id):
 # =========================================================================================================================
 
 
-# =================================================EDIT TRACKER LOG =======================================================
+# =================================================EDIT TRACKER LOG========================================================
 
 @app.route('/tracker/<int:tracker_id>/log/<int:log_id>/edit', methods = ['GET', 'POST'])
 @login_required
@@ -92,15 +146,20 @@ def edit_tracker_log(tracker_id, log_id):
 
             ldata = {
                 'id': log_data.id,
-                'timestamp': log_data.timestamp,
+                'timestamp': datetime.strftime(log_data.timestamp, date_format),
                 'note': log_data.note,
                 'value': [i.value for i in log_data.values]
             }
 
             if request.method == 'GET':
-                return render_template('tracker/log.html', edit_mode = True, tracker = tdata, log = ldata)
+                return render_template('tracker/log.html', title='Edit Log', edit_mode = True, tracker = tdata, log = ldata)
             
             else:
+                edit_form = Edit_Log_Form()
+                if not edit_form.validate_on_submit():
+                    flash('Validation error occurred while editing tracker log', 'error')
+                    return render_template('tracker/log.html', title='Edit Log', edit_mode=True, form=edit_form, retry=True, tracker=tdata, log=ldata, date_format=date_format)
+                
                 if request.form['tid'] == str(tracker_data.id) and request.form['lid'] == str(log_data.id):
                     try:
                         log_data.timestamp = datetime.strptime(request.form['ldate'], '%m/%d/%Y, %I:%M:%S %p')
@@ -139,7 +198,7 @@ def edit_tracker_log(tracker_id, log_id):
 # =========================================================================================================================
 
 
-# =================================================EDIT TRACKER LOG =======================================================
+# ===============================================DELETE TRACKER LOG========================================================
 @app.route('/tracker/<int:tracker_id>/log/<int:log_id>/delete', methods = ['GET'])
 @login_required
 def delete_tracker_log(tracker_id, log_id):

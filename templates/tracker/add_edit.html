@@ -2,25 +2,38 @@
 
 <h1>{% if edit_mode %}Edit{% else %}Add{% endif %} Tracker</h1>
 
+
+{% if form %}
+{% for field, errors in form.errors.items() %}
+<div class="alert alert-error">
+    {{ form[field].label }}: {{ ', '.join(errors) }}
+</div>
+{% endfor %}
+{% endif %}
+
 {% if edit_mode %}
 <form action="/tracker/{{tracker['id']}}/edit" method="POST" name="edit_tracker_form">
 {% else %}
 <form action="/tracker/add" method="POST" name="add_tracker_form">
 {% endif %}
     <p>
-        <label for="tname">Name</label> <input id="tname" name="tname" required type="text" value="{% if edit_mode %}{{tracker['name']}}{% endif %}">
+        <label for="tname">Name</label> <input id="tname" name="tname" required type="text" value="{% if retry %}{{form.tname.data}}{% elif edit_mode %}{{tracker['name']}}{% endif %}">
     </p>
 
 
     <p>
-        <label for="tdescription">Description</label> <input id="tdescription" name="tdescription" required type="text" value="{% if edit_mode %}{{tracker['description']}}{% endif %}">
+        <label for="tdescription">Description</label> <textarea id="tdescription" name="tdescription" type="text">{% if retry %}{{form.tdescription.data}}{% elif edit_mode %}{{tracker['description']}}{% endif %}</textarea>
     </p>
 
 
     <p>
         <label for="ttype">Tracker Type</label>
         <select name="ttype" id="ttype">
-            {% if edit_mode %}
+            {% if retry %}
+                {% if form.ttype.data != '' %}
+                    <option value="{{form.ttype.data}}" selected hidden>{% if form.ttype.data == 'ms' %}Multi-Select Choices{% elif form.ttype.data == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %}</option>
+                {% endif %}
+            {% elif edit_mode %}
                 {% if tracker['type'] != '' %}
                     <option value="{{tracker['type']}}" selected hidden>{% if tracker['type'] == 'ms' %}Multi-Select Choices{% elif tracker['type'] == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %}</option>
                 {% endif %}
@@ -44,12 +57,12 @@
     
     <p id='tchoiceblock'>
         <label for="tchoices">{% if edit_mode %} Add {% endif %}choices (Write each choice in single line.)</label>
-        <textarea name="tchoices" id="tchoices"></textarea>
+        <textarea name="tchoices" id="tchoices">{% if retry %}{{form.tchoices.data}}{% endif %}</textarea>
     </p>
 
 
     <p>
-        <label for="tsettings">Settings</label><input id="tsettings" name="tsettings" required type="text" value="{% if edit_mode %}{{tracker['settings']}}{% endif %}">
+        <label for="tsettings">Settings</label><input id="tsettings" name="tsettings" required type="text" value="{% if retry %}{{form.tsettings.data}}{% elif edit_mode %}{{tracker['settings']}}{% endif %}">
     </p>
 
     {% if edit_mode %}

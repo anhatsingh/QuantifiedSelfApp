@@ -39,7 +39,7 @@ CREATE TABLE user (
 
 CREATE TABLE tracker (
 	id integer PRIMARY KEY AUTOINCREMENT,
-	name varchar(100) NOT NULL,
+	name varchar(55) NOT NULL,
 	description varchar(255),
 	user_id integer NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE

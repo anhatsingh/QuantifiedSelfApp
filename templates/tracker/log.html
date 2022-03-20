@@ -2,18 +2,26 @@
 
 <h1>{% if edit_mode %}Edit Log{% else %}Log{% endif %} Tracker</h1>
 
+{% if form %}
+{% for field, errors in form.errors.items() %}
+<div class="alert alert-error" id="form_validation_error">
+    {{ form[field].label }}: {{ ', '.join(errors) }}
+</div>
+{% endfor %}
+{% endif %}
+
 {% if edit_mode %}
 <form action="/tracker/{{tracker['id']}}/log/{{log['id']}}/edit" method="POST" name="edit_tracker_log_form">
 {% else %}
 <form action="/tracker/{{tracker['id']}}/log/add" method="POST" name="add_tracker_log_form">
 {% endif %}
     <p>
-        <label for="ldate">Date</label> <input id="ldate" name="ldate" required type="datetime" value="{% if edit_mode %}{{log['timestamp']}}{% endif %}">
+        <label for="ldate">Date</label> <input id="ldate" name="ldate" required type="text" value="{% if retry %}{{form.ldate.data.strftime(date_format)}}{% elif edit_mode %}{{log['timestamp']}}{% endif %}">
     </p>
 
 {% if (tracker['type'] == 'integer' or tracker['type'] == 'float') %}
     <p>
-        <label for="lvalue">Value ({% if tracker['type'] == 'ms' %}Multi-Select Choices{% elif tracker['type'] == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %})</label> <input id="lvalue" name="lvalue" required type="text" value="{% if edit_mode %}{{log['value'][0]}}{% endif %}">
+        <label for="lvalue">Value ({% if tracker['type'] == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %})</label> <input id="lvalue" name="lvalue" required type="text" value="{% if retry %}{{form.lvalue.data}}{% elif edit_mode %}{{log['value'][0]}}{% endif %}">
     </p>
 {% elif (tracker['type'] == 'ms') %}
     <p>
@@ -27,9 +35,9 @@
 
     <p>
         <label for="lnote">Notes</label> 
-        <textarea id="lnote" name="lnote">{% if edit_mode %}{{log['note']}}{% endif %}</textarea>
+        <textarea id="lnote" name="lnote">{% if retry %}{{form.lnote.data}}{% elif edit_mode %}{{log['note']}}{% endif %}</textarea>
     </p>
-
+    
     <input name="tid" id="tid" type="hidden" value="{{tracker['id']}}">
     {% if edit_mode %}
         <input name="lid" id="lid" type="hidden" value="{{log['id']}}">
@@ -42,7 +50,8 @@
 <script>
     window.onload = function(){
         let loc = window.location.href;
-        if (loc.includes('/log/add')){
+        var elementExists = document.getElementById("form_validation_error");
+        if (loc.includes('/log/add') & elementExists == null){
             document.getElementById('ldate').value = new Date().toLocaleString();
         }
     }
