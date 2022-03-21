@@ -54,19 +54,8 @@ def add_tracker():
             new_tracker = Tracker(name = request.form['tname'], description = request.form['tdescription'], user_id=flask_login.current_user.id)
             # add the detais of new tracker to database session
             db.session.add(new_tracker)
-            # commit the session
-            db.session.commit()
-        except:
-            # some internal error occurred
-            app.logger.exception('Error occurred while creating a new tracker.')
-            # rollback whatever the last session changes were.
-            db.session.rollback()            
-            # set error flash message
-            flash('There was an error adding the tracker, please try again', 'error')
-            # redirect to add_tracker page
-            return redirect(url_for('add_tracker'))
-        
-        try:
+            # flushes the session, so we get the new tracker's id from database, without committing to disc yet.
+            db.session.flush()
             # get all the settings, remove spaces and split by comma
             for i in request.form['tsettings'].replace(' ', '').strip().split(','):
                 # make settings object
@@ -74,19 +63,9 @@ def add_tracker():
                 # add the details of new settings to db session
                 db.session.add(new_setting)
             
-            # commit all the changes commited to settings so far
-            db.session.commit()
-        except:
-            # some internal error occurred
-            app.logger.exception('Error occurred while adding settings to the new tracker.')
-            # rollback whatever the last session changes were.
-            db.session.rollback()            
-            # set error flash message
-            flash('There was an error adding the settings, please edit the tracker info to add settings', 'error')
-            # redirect to home page
-            return redirect(url_for('home_page'))
-        
-        try:
+            # flushes the session, so we get the new tracker's id from database, without committing to disc yet.
+            db.session.flush()
+
             ttype = request.form['ttype']
             # if tracker type is multiple select
             if ttype == 'ms':
@@ -111,11 +90,11 @@ def add_tracker():
             db.session.commit()
         except:
             # some internal error occurred
-            app.logger.exception('Error occurred while adding Tracker Type to the new tracker.')
+            app.logger.exception('Error occurred while adding Tracker')
             # rollback whatever the last session changes were.
             db.session.rollback()            
             # set error flash message
-            flash('There was an error setting the tracker type, please edit the tracker info to change the type', 'error')
+            flash('There was an error adding the tracker', 'error')
             # redirect to home page
             return redirect(url_for('home_page'))
 
@@ -139,7 +118,7 @@ def edit_tracker(id):
     # check if a tracker with the provided id and made by current user exists or not.
     tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=id).one_or_none()
     # if it exists, proceed.
-    if tracker_data:            
+    if tracker_data:
         # get datatype of the tracker
         datatypes = list(set([i.datatype for i in tracker_data.ttype]))
         # collect all the data about the current tracker being edited.
@@ -322,7 +301,8 @@ def show_tracker_log(id, period):
                     else:
                         chart_data[i] = this_data['value'].count(i)
             
-            else:                
+            else:
+                include = False
                 difference_in_time = datetime.today() - this_data['timestamp']
                 if period == 'w' and difference_in_time.days <= 7:
                     ts = datetime.strftime(i.timestamp, "%Y-%m-%d")

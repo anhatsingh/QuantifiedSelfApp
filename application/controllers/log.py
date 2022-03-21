@@ -79,22 +79,27 @@ def add_tracker_log(id):
         else:
             add_form = Add_Log_Form()
             if not add_form.validate_on_submit():
-                flash('Validation error occurred while logging tracker', 'error')
-                return render_template('tracker/log.html', title='Log Tracker', form=add_form, retry=True, tracker=data, date_format=date_format)
+                time_error = False
+                for field in add_form.errors.keys():
+                    if field == 'ldate':
+                        add_form['ldate'].data = datetime.now()
+                        time_error = True
+
+                flash('Validation error occurred while logging tracker', 'error')                
+                return render_template('tracker/log.html', title='Log Tracker', form=add_form, retry=True, tracker=data, date_format=date_format, time_error=time_error)
 
             if request.form['tid'] == str(id):
                 try:
+                    try:
+                        datetime.strptime(request.form['ldate'], date_format)
+                    except ValueError:
+                        flash(f'Timestamp should be in the format {datetime.strftime(datetime.now(), date_format)}', 'error')
+                        return render_template('tracker/log.html', title='Log Tracker', form=add_form, retry=True, tracker=data, date_format=date_format)
+
                     log = Tracker_log(tracker_id = tracker_data.id, note = request.form['lnote'], timestamp = datetime.strptime(request.form['ldate'], '%m/%d/%Y, %I:%M:%S %p'))
                     db.session.add(log)
-                    db.session.commit()
-                except:
-                    app.logger.exception(f'Error ocurred while adding tracker log')
-                    # if any internal error occurs, rollback the database
-                    db.session.rollback()
-                    flash('Internal error occurred, wasn\'t able to add tracker log', 'error')
-                    return redirect(url_for('home_page'))
-                
-                try:
+                    db.session.flush()
+
                     if data['type'] == 'ms':
                         choices = request.form.getlist('lchoice')
                         for i in choices:

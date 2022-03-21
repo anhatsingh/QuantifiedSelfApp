@@ -1,0 +1,1497 @@
+openapi: 3.0.0
+info:
+  title: QuantifiedSelf API
+  version: '1.2'
+  description: This api is made by Anhat Singh to access QuantifiedSelf App with the help of API access.
+  contact:
+    name: Anhat Singh
+    url: anhatsingh.com
+    email: anhatsingh2001@gmail.com
+servers:
+  - url: 'http://127.0.0.1:5000'
+    description: localhost
+paths:
+  /api/login:
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    minLength: 1
+                required:
+                  - access_token
+                x-examples:
+                  example-1:
+                    access_token: hsjjgdfwydgf
+              examples:
+                example-1:
+                  value:
+                    access_token: string
+        '400':
+          description: Bad Request; including validation errors
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+        '401':
+          description: Invalid username or password supplied
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: Bad username or password
+              examples:
+                login_error_401:
+                  value:
+                    msg: Bad username or password
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: Internal server error occurred
+              examples:
+                Internal Server Error:
+                  value:
+                    msg: Internal server error occurred
+      description: Login user and get JWT Authentication Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  username: test@test.com
+                  password: mypass
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+              required:
+                - email
+                - password
+            examples:
+              example-1:
+                value:
+                  email: test@test.com
+                  password: mypassword
+  /api/tracker:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: ''
+                minItems: 1
+                uniqueItems: true
+                x-examples:
+                  example-1:
+                    - id: 6
+                      name: Test Tracker 1
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.'
+                      type: float
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                      choices: null
+                    - id: 8
+                      name: Test Tracker 1
+                      description: This is my description of a tracker
+                      type: ms
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                        - lmno
+                        - pqrstu
+                      choices:
+                        - id: 26
+                          value: xx1
+                        - id: 27
+                          value: xx256
+                        - id: 28
+                          value: xx3
+                        - id: 29
+                          value: xx4
+                    - id: 10
+                      name: API Test 4
+                      description: The description has been updated
+                      type: ms
+                      settings:
+                        - api1
+                        - api2
+                        - api3
+                      choices:
+                        - id: 55
+                          value: Eating
+                        - id: 56
+                          value: Pooping
+                        - id: 57
+                          value: Dancing
+                        - id: 58
+                          value: Running
+                    - id: 11
+                      name: API Test Integer
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.'
+                      type: ms
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                        - lmno
+                        - pqrstu
+                      choices:
+                        - id: 87
+                          value: placeholder choice
+                    - id: 12
+                      name: Running
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.'
+                      type: integer
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                        - lmno
+                        - pqrstu
+                      choices: null
+                    - id: 14
+                      name: abcdefghijklmnopqrstuvwxyz
+                      description: blah blah blah
+                      type: integer
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                        - lmno
+                        - pqrstu
+                      choices: null
+                    - id: 17
+                      name: Test Tracker 1 API
+                      description: This tracker is to be inserted into the database API.
+                      type: integer
+                      settings:
+                        - setting1
+                        - setting2
+                        - setting3
+                      choices: null
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
+                      minLength: 1
+                    description:
+                      type: string
+                      minLength: 1
+                    type:
+                      type: string
+                      minLength: 1
+                    settings:
+                      type: array
+                      items:
+                        type: string
+                    choices:
+                      type: array
+                      nullable: true
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          value:
+                            type: string
+                  required:
+                    - id
+                    - name
+                    - description
+                    - type
+                    - settings
+              examples:
+                example-1:
+                  value:
+                    - id: 6
+                      name: Test Tracker 1
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.'
+                      type: float
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                      choices: null
+                    - id: 8
+                      name: Test Tracker 1
+                      description: This is my description of a tracker
+                      type: ms
+                      settings:
+                        - abc
+                        - def
+                        - ghi
+                        - jkl
+                        - lmno
+                        - pqrstu
+                      choices:
+                        - id: 26
+                          value: xx1
+                        - id: 27
+                          value: xx256
+                        - id: 28
+                          value: xx3
+                        - id: 29
+                          value: xx4
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '404':
+          description: No trackers under current user found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: The resource was not found on this server
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: sdmk
+              examples:
+                example-1:
+                  value:
+                    msg: Internal Server error occurred
+      operationId: get-api-tracker
+      security:
+        - api_key_jwt: []
+      description: Get all the trackers registered under logged-in user
+    post:
+      summary: ''
+      operationId: post-api-tracker
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: added tracker
+              examples:
+                example-1:
+                  value:
+                    msg: added tracker
+        '400':
+          description: Bad Request; including validation errors
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error occurred
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '500':
+          description: Internal Server Error
+      description: Add a new tracker under the logged-in user
+      security:
+        - api_key_jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  name: Test Tracker API
+                  description: This was created using API
+                  type: integer
+                  settings:
+                    - s1
+                    - s2
+                    - s3
+              properties:
+                name:
+                  type: string
+                  minLength: 5
+                  maxLength: 55
+                description:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                type:
+                  type: string
+                  minLength: 1
+                settings:
+                  type: array
+                  items:
+                    type: string
+                    maxLength: 255
+                choices:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+              required:
+                - name
+                - type
+                - settings
+            examples:
+              Multi Select Example:
+                value:
+                  name: Test Tracker API
+                  description: This was created using API
+                  type: ms
+                  settings:
+                    - s1
+                    - s2
+                    - s3
+                  choices:
+                    - xx1
+                    - xx2
+                    - xx3
+              Integer/Float Example:
+                value:
+                  name: Test Tracker API
+                  description: This was created using API
+                  type: integer
+                  settings:
+                    - s1
+                    - s2
+                    - s3
+                  choices: null
+        description: Details of tracker to be added
+  '/api/tracker/{tracker_id}':
+    parameters:
+      - schema:
+          type: string
+        name: tracker_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    id: 10
+                    name: API Test 4
+                    description: The description has been updated
+                    type: ms
+                    settings:
+                      - api1
+                      - api2
+                      - api3
+                    choices:
+                      - id: 55
+                        value: Eating
+                      - id: 56
+                        value: Pooping
+                      - id: 57
+                        value: Dancing
+                      - id: 58
+                        value: Running
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                    minLength: 1
+                  description:
+                    type: string
+                    minLength: 1
+                  type:
+                    type: string
+                    minLength: 1
+                  settings:
+                    type: array
+                    items:
+                      type: string
+                  choices:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    nullable: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        value:
+                          type: string
+                          minLength: 1
+                      required:
+                        - id
+                        - value
+                required:
+                  - id
+                  - name
+                  - description
+                  - type
+                  - settings
+                  - choices
+              examples:
+                With choices:
+                  value:
+                    id: 10
+                    name: API Test 4
+                    description: The description has been updated
+                    type: ms
+                    settings:
+                      - api1
+                      - api2
+                      - api3
+                    choices:
+                      - id: 55
+                        value: Eating
+                      - id: 56
+                        value: Pooping
+                      - id: 57
+                        value: Dancing
+                      - id: 58
+                        value: Running
+                Without choices:
+                  value:
+                    id: 10
+                    name: API Test 4
+                    description: The description has been updated
+                    type: integer
+                    settings:
+                      - api1
+                      - api2
+                      - api3
+                    choices: null
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized access
+        '404':
+          description: No tracker with the id found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: The requested resource was not found
+              examples:
+                example-1:
+                  value:
+                    msg: The requested resource was not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: Internal server error occurred
+              examples:
+                example-1:
+                  value:
+                    msg: Internal server error occurred
+      operationId: get-api-tracker-tracker_id
+      description: get information of tracker with id as tracker_id
+      security:
+        - api_key_jwt: []
+    delete:
+      summary: ''
+      operationId: delete-api-tracker-tracker_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: success
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '404':
+          description: Tracker with given id was not found on the server
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+      description: Delete tracker with id = tracker_id
+      security:
+        - api_key_jwt: []
+    patch:
+      summary: ''
+      operationId: patch-api-tracker-tracker_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: success
+        '400':
+          description: Bad Request; Including validation errors
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized access
+        '404':
+          description: No tracker with the given id found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+      description: update the parameters of a tracker with id=tracker_id
+      security:
+        - api_key_jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  name: Test Tracker 1
+                  description: This is my description of a tracker
+                  type: ms
+                  settings:
+                    - abc
+                    - def
+                    - ghi
+                    - jkl
+                    - lmno
+                    - pqrstu
+                  choices:
+                    - id: 26
+                      value: xx1
+                    - id: 27
+                      value: xx256
+                    - id: 28
+                      value: xx3
+                    - id: 29
+                      value: xx4
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                description:
+                  type: string
+                  minLength: 1
+                type:
+                  type: string
+                  minLength: 1
+                  enum:
+                    - ms
+                    - integer
+                    - float
+                settings:
+                  type: array
+                  items:
+                    type: string
+                delete_choices:
+                  type: boolean
+                  description: 'if set to true, all choices can be deleted.'
+                choices:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: 'if id is null, new choice with name as ''new_name'' is added under the tracker.'
+                        nullable: true
+                      new_name:
+                        type: string
+                        minLength: 1
+                        description: 'if id is not null, and new_name is a 0-character string, the choice with the id is deleted.'
+  '/api/tracker/{tracker_id}/logs':
+    parameters:
+      - schema:
+          type: string
+        name: tracker_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: ''
+                minItems: 1
+                uniqueItems: true
+                x-examples:
+                  example-1:
+                    - id: 24
+                      timestamp: '03/18/2022, 02:49:13 AM'
+                      note: i have changed the note using api
+                      value:
+                        - choice_id: 57
+                          choice_name: Dancing
+                    - id: 29
+                      timestamp: '03/18/2022, 01:58:22 PM'
+                      note: ''
+                      value:
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                        - choice_id: 58
+                          choice_name: Running
+                    - id: 31
+                      timestamp: '03/20/2022, 08:31:06 PM'
+                      note: blah blah blah
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                    - id: 37
+                      timestamp: '03/21/2022, 07:41:14 PM'
+                      note: null
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                    - id: 39
+                      timestamp: '02/22/1998, 01:55:59 AM'
+                      note: api test 1
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    timestamp:
+                      type: string
+                      minLength: 1
+                    note:
+                      type: string
+                      nullable: true
+                    value:
+                      oneOf:
+                        - type: array
+                        - type: number
+                      uniqueItems: true
+                      minItems: 1
+                      items:
+                        type: object
+                        properties:
+                          choice_id:
+                            type: integer
+                          choice_name:
+                            type: string
+                            minLength: 1
+                        required:
+                          - choice_id
+                          - choice_name
+                  required:
+                    - id
+                    - timestamp
+                    - note
+                    - value
+              examples:
+                multi-select:
+                  value:
+                    - id: 24
+                      timestamp: '03/18/2022, 02:49:13 AM'
+                      note: i have changed the note using api
+                      value:
+                        - choice_id: 57
+                          choice_name: Dancing
+                    - id: 29
+                      timestamp: '03/18/2022, 01:58:22 PM'
+                      note: ''
+                      value:
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                        - choice_id: 58
+                          choice_name: Running
+                    - id: 31
+                      timestamp: '03/20/2022, 08:31:06 PM'
+                      note: blah blah blah
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                    - id: 37
+                      timestamp: '03/21/2022, 07:41:14 PM'
+                      note: null
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                    - id: 39
+                      timestamp: '02/22/1998, 01:55:59 AM'
+                      note: api test 1
+                      value:
+                        - choice_id: 55
+                          choice_name: Eating
+                        - choice_id: 56
+                          choice_name: Pooping
+                        - choice_id: 57
+                          choice_name: Dancing
+                integer/float:
+                  value:
+                    - id: 25
+                      timestamp: '03/18/2022, 01:07:56 PM'
+                      note: 'I have run 50km, more than possible.'
+                      value: 50
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '404':
+          description: No logs found under the given tracker id
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: internal error
+              examples:
+                example-1:
+                  value:
+                    msg: internal error
+      operationId: get-api-tracker-tracker_id-logs
+      description: get all the logs registered under the tracker with id = tracker_id
+      security:
+        - api_key_jwt: []
+    post:
+      summary: ''
+      operationId: post-api-tracker-tracker_id-logs
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: success
+        '400':
+          description: Bad Request; Including validation error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error occurred
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: internal error
+              examples:
+                example-1:
+                  value:
+                    msg: internal error
+      description: Log value(s) under the tracker with given id
+      security:
+        - api_key_jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  timestamp: '02/22/1998, 01:55:59 AM'
+                  note: api test 1
+                  value:
+                    - 55
+                    - 56
+                    - 57
+              properties:
+                timestamp:
+                  type: string
+                  minLength: 1
+                  format: date-time
+                note:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                value:
+                  oneOf:
+                    - type: array
+                    - type: number
+                  description: 'If tracker is not multi-select, value takes integer/float figures. If it is multi-select, value takes an array of choices to mark ticked among choices registered under this tracker.'
+                  items:
+                    type: number
+              required:
+                - value
+  '/api/tracker/{tracker_id}/logs/{log_id}':
+    parameters:
+      - schema:
+          type: string
+        name: tracker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: log_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    id: 24
+                    timestamp: '03/18/2022, 02:49:13 AM'
+                    note: i have changed the note using api
+                    value:
+                      - choice_id: 57
+                        choice_name: Dancing
+                properties:
+                  id:
+                    type: number
+                  timestamp:
+                    type: string
+                    minLength: 1
+                  note:
+                    type: string
+                    minLength: 1
+                  value:
+                    oneOf:
+                      - type: array
+                      - type: number
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      type: object
+                      properties:
+                        choice_id:
+                          type: number
+                        choice_name:
+                          type: string
+                          minLength: 1
+                      required:
+                        - choice_id
+                        - choice_name
+                required:
+                  - id
+                  - timestamp
+                  - note
+                  - value
+              examples:
+                with choices:
+                  value:
+                    id: 24
+                    timestamp: '03/18/2022, 02:49:13 AM'
+                    note: i have changed the note using api
+                    value:
+                      - choice_id: 57
+                        choice_name: Dancing
+                without choices:
+                  value:
+                    id: 25
+                    timestamp: '03/18/2022, 01:07:56 PM'
+                    note: 'I have run 50km, more than possible.'
+                    value: 50
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: not found
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error
+              examples:
+                example-1:
+                  value:
+                    msg: error
+      operationId: get-api-tracker-tracker_id-logs-log_id
+      description: get the information of log having id=log_id registered under tracker with id=tracker_id
+      security:
+        - api_key_jwt: []
+    delete:
+      summary: ''
+      operationId: delete-api-tracker-tracker_id-logs-log_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: success
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized Access
+        '404':
+          description: No logs found with given id under given tracker
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+      description: delete the log having id=log_id under tracker with id=tracker_id
+      security:
+        - api_key_jwt: []
+    patch:
+      summary: ''
+      operationId: patch-api-tracker-tracker_id-logs-log_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: success
+        '400':
+          description: Bad Request; Including validation errors
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error occurred
+              examples:
+                example-1:
+                  value:
+                    msg: error occurred
+        '401':
+          description: Unauthorized; Token has not been created/expired.
+        '403':
+          description: Forbidden; Unauthorized access
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: success
+              examples:
+                example-1:
+                  value:
+                    msg: not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: error
+              examples:
+                example-1:
+                  value:
+                    msg: error
+      description: Update details of logs with id=log_id registered under tracker with id=tracker_id
+      security:
+        - api_key_jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  timestamp: '01/10/1999, 01:10:59 AM'
+                  note: blah blah blah
+                  value:
+                    - 10
+                    - 20
+                    - 30
+                    - 40
+              properties:
+                timestamp:
+                  type: string
+                  minLength: 1
+                note:
+                  type: string
+                  minLength: 1
+                value:
+                  oneOf:
+                    - type: array
+                    - type: number
+                  description: |-
+                    If multi-select type of tracker is there, value is an array of id of choices to be marked ticked.
+                    If other type, number is taken as input to store into the database.
+                  items:
+                    type: integer
+              required:
+                - value
+            examples:
+              with choices:
+                value:
+                  timestamp: '01/10/1999, 01:10:59 AM'
+                  note: blah blah blah
+                  value:
+                    - 10
+                    - 20
+                    - 30
+                    - 40
+              without choices:
+                value:
+                  timestamp: '01/10/1999, 01:10:59 AM'
+                  note: blah blah blah
+                  value: 24.56
+components:
+  schemas: {}
+  securitySchemes:
+    api_key_jwt:
+      type: http
+      scheme: bearer
+security:
+  - api_key_jwt: []
