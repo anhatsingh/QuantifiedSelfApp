@@ -75,7 +75,7 @@ def add_tracker_log(id):
         }
 
         if request.method == 'GET':
-            return render_template('tracker/log.html', tracker=data)
+            return render_template('tracker/log.html', tracker=data, title='Log Tracker')
         else:
             add_form = Add_Log_Form()
             if not add_form.validate_on_submit():

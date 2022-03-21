@@ -1,5 +1,5 @@
 function create_line_chart(name, chart_data, xkey, ykeys, labels){
-    new Morris.Line({
+    window.line_chart = new Morris.Line({
         // ID of the element in which to draw the chart.
         element: name,
         // Chart data records -- each entry in this array corresponds to a point on
@@ -12,19 +12,23 @@ function create_line_chart(name, chart_data, xkey, ykeys, labels){
         // Labels for the ykeys -- will be displayed when you hover over the
         // chart.
         labels: labels,
-        parseTime: false
+        parseTime: false,
+        resize: true,
+        redraw: true
       });
 }
 
 
 function create_bar_chart(name, chart_data){
-    new Morris.Bar({
+    window.bar_chart = new Morris.Bar({
         // ID of the element in which to draw the chart.
         element: name,
         data: chart_data,
         xkey: 'y',
         ykeys: ['a'],
-        labels: ['Series A']
+        labels: ['Series A'],
+        resize: true,
+        redraw: true
       });
 }
 
@@ -35,3 +39,9 @@ window.onload = function(){
     return new bootstrap.Tooltip(tooltipTriggerEl)
   });
 }
+
+window.setTimeout(function() {
+  $(".autofade").fadeTo(500, 0).slideUp(500, function(){
+      $(this).remove(); 
+  });
+}, 4000);

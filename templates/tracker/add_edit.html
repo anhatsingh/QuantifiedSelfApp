@@ -1,34 +1,51 @@
 {% with title=title %}{% include "header.html" %}{% endwith %}
 
-<h1>{% if edit_mode %}Edit{% else %}Add{% endif %} Tracker</h1>
+<div class="col col-11">
+<div class="row justify-content-md-center">
+    <div class="col-md-auto">
+        
+<h2 class="page-head">
+    {% if edit_mode %}Edit {{tracker['name']}}{% else %}Add Tracker{% endif %}
+</h2>
+</div>
+<!--<hr class="my-4">-->
+</div>
 
 
 {% if form %}
 {% for field, errors in form.errors.items() %}
-<div class="alert alert-error">
-    {{ form[field].label }}: {{ ', '.join(errors) }}
-</div>
+<div class="alert alert-danger alert-dismissible fade show highest-index" role="alert">
+    <h4 class="alert-heading">Vaidation Error</h4> {{ form[field].label }}: {{ ', '.join(errors) }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 {% endfor %}
 {% endif %}
+
+<div class="row justify-content-md-center">
+<div class="col-md-6">
 
 {% if edit_mode %}
 <form action="/tracker/{{tracker['id']}}/edit" method="POST" name="edit_tracker_form" id="edit_tracker_form">
 {% else %}
 <form action="/tracker/add" method="POST" name="add_tracker_form" id="add_tracker_form">
 {% endif %}
-    <p>
-        <label for="tname">Name</label> <input id="tname" name="tname" required minlength="5" maxlength="55" type="text" value="{% if retry %}{{form.tname.data}}{% elif edit_mode %}{{tracker['name']}}{% endif %}">
-    </p>
+
+    <div class="form-group">
+        <label for="tname">Name</label>
+        <input id="tname" class="form-control" name="tname" aria-describedby="trackerNameHelp" required minlength="5" maxlength="55" type="text" value="{% if retry %}{{form.tname.data}}{% elif edit_mode %}{{tracker['name']}}{% endif %}">        
+        <small id="trackerNameHelp" class="form-text text-muted">This is the name of the tracker, you are gonna track this everyday :P</small>
+    </div>
+
+    <div class="form-group">
+        <label for="tdescription">Description</label>
+        <textarea id="tdescription" class="form-control" aria-describedby="trackerDescriptionHelp" name="tdescription" maxlength="255" type="text">{% if retry %}{{form.tdescription.data}}{% elif edit_mode %}{{tracker['description']}}{% endif %}</textarea>
+        <small id="trackerDescriptionHelp" class="form-text text-muted">Description of the tracker. Don't worry, no one is gonna judge your grammar ;)</small>
+    </div>
 
 
-    <p>
-        <label for="tdescription">Description</label> <textarea id="tdescription" name="tdescription" maxlength="255" type="text">{% if retry %}{{form.tdescription.data}}{% elif edit_mode %}{{tracker['description']}}{% endif %}</textarea>
-    </p>
-
-
-    <p>
+    <div class="form-group">
         <label for="ttype">Tracker Type</label>
-        <select name="ttype" id="ttype" required>
+        <select name="ttype" id="ttype" class="form-control" required>
             {% if retry %}
                 {% if form.ttype.data != '' %}
                     <option value="{{form.ttype.data}}" selected hidden>{% if form.ttype.data == 'ms' %}Multi-Select Choices{% elif form.ttype.data == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %}</option>
@@ -42,27 +59,32 @@
             <option value="float">Numerical (Decimal)</option>
             <option value="ms">Multi-Select Choices</option>
         </select>
-    </p>
+        {% if edit_mode %}<small id="trackerDescriptionHelp" class="form-text text-muted"><p style="color:red;">WARNING! Changing this will delete all the logged items of this tracker</p></small>{% endif %}
+    </div>
 
 
 
-    {% if edit_mode and tracker['type'] == 'ms' %}
+    <!--{% if edit_mode and tracker['type'] == 'ms' %}
     {% for i in tracker['choices'] %}
     <p class="tce">
         <label for="tchoices_edit">Choice {{loop.index}}</label>
         <input name="tchoices_edit{{i[0]}}" id="tchoices_edit" value="{{i[1]}}">
     </p>
     {% endfor %}
-    {% endif %}
+    {% endif %}-->
     
-    <p id='tchoiceblock'>
-        <label for="tchoices">{% if edit_mode %} Add {% endif %}choices (Write each choice in single line.)</label>
-        <textarea name="tchoices" id="tchoices">{% if retry %}{{form.tchoices.data}}{% endif %}</textarea>
-    </p>
+    <div class="form-group" id='tchoiceblock'>
+        <label for="tchoices">Choices</label>
+        <textarea name="tchoices" class="form-control" id="tchoices" aria-describedby="trackerChoiceHelp">{% if retry %}{{form.tchoices.data}}{% endif %}</textarea>
+        <small id="trackerChoiceHelp" class="form-text text-muted">Type the choices of tracker here (comma separated)</small>
+        {% if edit_mode %}<small id="trackerDescriptionHelp" class="form-text text-muted"><p style="color:red;">WARNING! Deleting choices will also delete their logged data</p></small>{% endif %}
+    </div>
 
 
-    <p>
-        <label for="tsettings">Settings</label><input id="tsettings" name="tsettings" required type="text" value="{% if retry %}{{form.tsettings.data}}{% elif edit_mode %}{{tracker['settings']}}{% endif %}">
+    <div class="form-group">
+        <label for="tsettings">Settings</label>
+        <input id="tsettings" name="tsettings" aria-describedby="trackerSettingsHelp" class="form-control" required type="text" value="{% if retry %}{{form.tsettings.data}}{% elif edit_mode %}{{tracker['settings']}}{% endif %}">
+        <small id="trackerNameHelp" class="form-text text-muted">Use comma or enter to separate different settings</small>
     </p>
 
     {% if edit_mode %}
@@ -70,10 +92,13 @@
         <input name="oldtype" id="oldtype" type="hidden" value="{{tracker['type']}}" required>
     {% endif %}
 
-    <p><input id="submit" name="submit" type="submit" value="Submit"></p>
+    <div class="form-group"><input id="submit" class="form-control btn btn-primary" name="submit" type="submit" value="Submit"></div>
 
 </form>
+</div>
+</div>
 
+</div>
 <script>
 
     window.onload = function(){
@@ -83,38 +108,50 @@
     theChoiceBlock.style.display = 'none';
 
     selected_choice = document.getElementById('ttype');
-    theChoiceBlock_duringEdit = document.getElementsByClassName('tce')
 
     if (selected_choice.value == 'ms'){
-        theChoiceBlock.style.display = 'block';
-        {% if edit_mode %}
-        theChoiceBlock_duringEdit.style.display = 'block';
-        {% endif %}
+        theChoiceBlock.style.display = 'block';        
         theChoice_textArea.required = true;
     } else {
-        theChoiceBlock.style.display = 'none';
-        {% if edit_mode %}
-        theChoiceBlock_duringEdit.style.display = 'none';
-        {% endif %}
+        theChoiceBlock.style.display = 'none';        
         theChoice_textArea.required = false;
     };
     
     selected_choice.onchange = function(){
         if (selected_choice.value == 'ms'){
-            theChoiceBlock.style.display = 'block';
-            {% if edit_mode %}
-            theChoiceBlock_duringEdit.style.display = 'block';
-            {% endif %}
+            theChoiceBlock.style.display = 'block';            
             theChoice_textArea.required = true;
         } else {
-            theChoiceBlock.style.display = 'none';
-            {% if edit_mode %}
-            theChoiceBlock_duringEdit.style.display = 'none';
-            {% endif %}
+            theChoiceBlock.style.display = 'none';            
             theChoice_textArea.required = false;
         };  
     };
 }
+</script>
+
+<script>
+    // The DOM element you wish to replace with Tagify
+var settings = document.querySelector('input[name=tsettings]');
+
+// initialize Tagify on the above input node reference
+var tagify_settings = new Tagify(settings);
+
+
+var choices = document.querySelector('textarea[name=tchoices]');
+
+// initialize Tagify on the above input node reference
+var tagify_choices = new Tagify(choices);
+
+{% if edit_mode and tracker['type'] == 'ms' %}
+
+tagify_choices.addTags([
+    {% for i in tracker['choices'] %}
+    {id: {{i[0]}}, value: "{{i[1] | e}}"},
+    {% endfor %}
+])
+
+{% endif %}
+
 </script>
 
 {% with title=title %}{% include "footer.html" %}{% endwith %}

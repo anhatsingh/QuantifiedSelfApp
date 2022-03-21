@@ -2,7 +2,7 @@ from flask import Flask, request, redirect, url_for, flash, abort
 from flask import render_template
 from flask import current_app as app
 from flask_security import login_required
-import flask_login
+import flask_login, json
 from flask_wtf import FlaskForm
 from wtforms import (StringField, TextAreaField, SelectField, HiddenField)
 from wtforms.validators import InputRequired, Length, AnyOf, ValidationError
@@ -47,7 +47,7 @@ def add_tracker():
         add_form = Add_Tracker_Form()
         # TODO Add tracker choice - time duration
         if not add_form.validate_on_submit():
-            flash('Validation error occurred while adding tracker', 'error')
+            flash('Validation error occurred while adding tracker', 'danger')
             return render_template('tracker/add_edit.html', title='Add Tracker', form=add_form, retry=True)
         try:
             # get the new tracker's object
@@ -56,10 +56,10 @@ def add_tracker():
             db.session.add(new_tracker)
             # flushes the session, so we get the new tracker's id from database, without committing to disc yet.
             db.session.flush()
-            # get all the settings, remove spaces and split by comma
-            for i in request.form['tsettings'].replace(' ', '').strip().split(','):
+            # get all the settings from json format, remove spaces and split by comma
+            for i in json.loads(request.form['tsettings']):
                 # make settings object
-                new_setting = Settings(tracker_id = new_tracker.id, value = i)
+                new_setting = Settings(tracker_id = new_tracker.id, value = i['value'])
                 # add the details of new settings to db session
                 db.session.add(new_setting)
             
@@ -70,10 +70,10 @@ def add_tracker():
             # if tracker type is multiple select
             if ttype == 'ms':
                 # get all the choices splitted across the \n
-                tchoices = request.form['tchoices'].strip().split('\n')
+                tchoices = json.loads(request.form['tchoices'])
                 # add each choice to the database
                 for i in tchoices:
-                    new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i.strip())
+                    new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i['value'].strip())
                     db.session.add(new_choice)
             
             # if tracker type is integer values
@@ -94,7 +94,7 @@ def add_tracker():
             # rollback whatever the last session changes were.
             db.session.rollback()            
             # set error flash message
-            flash('There was an error adding the tracker', 'error')
+            flash('There was an error adding the tracker', 'danger')
             # redirect to home page
             return redirect(url_for('home_page'))
 
@@ -141,7 +141,7 @@ def edit_tracker(id):
             edit_form = Edit_Tracker_Form()
             # if it exists, proceed. Additionally also check if tracker url id and form hidden field id matches or not.
             if not edit_form.validate_on_submit():
-                flash('Validation error occurred while editing tracker', 'error')
+                flash('Validation error occurred while editing tracker', 'danger')
                 return render_template('tracker/add_edit.html', form=edit_form, retry=True, title=f'Edit Tracker {id}', edit_mode=True, tracker=data)
 
             if id == int(request.form['tid']):
@@ -155,9 +155,9 @@ def edit_tracker(id):
                         db.session.delete(i)
                     
                     # add new settings for the tracker
-                    for i in request.form['tsettings'].replace(' ', '').strip().split(','):
+                    for i in json.loads(request.form['tsettings']):
                         # make settings object
-                        new_setting = Settings(tracker_id = tracker_data.id, value = i)
+                        new_setting = Settings(tracker_id = tracker_data.id, value = i['value'])
                         # add the details of new settings to db session
                         db.session.add(new_setting)
                     
@@ -177,10 +177,10 @@ def edit_tracker(id):
                         # if tracker type is multiple select
                         if ttype == 'ms':
                             # get all the choices splitted across the \n
-                            tchoices = request.form['tchoices'].strip().split('\n')
+                            tchoices = json.loads(request.form['tchoices'])
                             # add each choice to the database
                             for i in tchoices:
-                                new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = i)
+                                new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = i['value'])
                                 db.session.add(new_choice)
                         
                         # if tracker type is integer values
@@ -196,25 +196,25 @@ def edit_tracker(id):
                     else:
                         # if tracker type is multiple select
                         if ttype == 'ms':
-
-                            old_ids = tracker_data.ttype
-                            for x in old_ids:
-                                new_value = request.form[f'tchoices_edit{x.id}']
-                                if new_value != '':
-                                    x.value = new_value
-                                else:
-                                    vals = db.delete(Tracker_log_value).where(Tracker_log_value.value.in_([x.id]))                                    
-                                    db.session.execute(vals)
-                                    db.session.delete(x)
+                            tchoices = json.loads(request.form['tchoices'])
+                            old_ids = [x.id for x in tracker_data.ttype]
                             
-                            # if newly added choices.
-                            tchoices = request.form['tchoices'].strip().split('\n')
-                            # add each choice to the database
-                            for i in tchoices:
-                                if i != '':
-                                    new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = i)
+                            
+                            for x in tchoices:
+                                if 'id' in x:
+                                    choice_from_db = Tracker_type.query.filter_by(id=x['id']).one_or_none()                                    
+                                    if choice_from_db != None:
+                                        choice_from_db.value = x['value']                                    
+                                    old_ids.remove(x['id'])
+                                
+                                else:
+                                    new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = x['value'].strip())
                                     db.session.add(new_choice)
-
+                            
+                            if len(old_ids) > 0:
+                                for o in old_ids:
+                                    choice_from_db = Tracker_type.query.filter_by(id=o).one_or_none()
+                                    db.session.delete(choice_from_db)
                     
                     # commit all the above changes to the database
                     db.session.commit()
@@ -223,7 +223,7 @@ def edit_tracker(id):
                     app.logger.exception(f'Error ocurred while editing tracker with id {id}')
                     # if any internal error occurs, rollback the database
                     db.session.rollback()
-                    flash('Internal error occurred, wasn\'t able to update tracker', 'error')
+                    flash('Internal error occurred, wasn\'t able to update tracker', 'danger')
                     return redirect(url_for('edit_tracker', id=id))
                 
                 flash('Succesfully updated tracker info', 'success')
@@ -253,7 +253,7 @@ def delete_tracker(id):
             app.logger.exception(f'Error ocurred while deleting tracker with id {id}')
             # if any internal error occurs, rollback the database
             db.session.rollback()
-            flash('Internal error occurred, wasn\'t able to delete tracker', 'error')
+            flash('Internal error occurred, wasn\'t able to delete tracker', 'danger')
             return redirect(url_for('home_page'))
         
         flash('Succesfully deleted tracker', 'success')
@@ -311,7 +311,7 @@ def show_tracker_log(id, period):
                     ts = datetime.strftime(i.timestamp, "%Y-%m-%d")                
                     include = True
                 elif period == 'd' and difference_in_time.days <= 0:
-                    ts = datetime.strftime(i.timestamp, "%H:00")                    
+                    ts = datetime.strftime(i.timestamp, "%H:%M")                    
                     include = True
                 elif period == 'a':
                     ts = datetime.strftime(i.timestamp, "%Y-%m-%d")
@@ -342,8 +342,8 @@ def show_tracker_log(id, period):
                     key = datetime.strftime(datetime.today()-timedelta(hours=i), "%H:00")
                     if key not in chart_data:
                         chart_data[key] = 0
-        
-        return render_template('tracker/show.html', tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())))
+        log_data = sorted(log_data, key=lambda d: d['timestamp'],reverse=True)
+        return render_template('tracker/show.html', title=f"Logs {tdata['name']}", tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())))
 
 
 # =========================================================================================================================
