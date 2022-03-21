@@ -1487,6 +1487,85 @@ paths:
                   timestamp: '01/10/1999, 01:10:59 AM'
                   note: blah blah blah
                   value: 24.56
+  /api/register:
+    post:
+      summary: ''
+      operationId: post-api-register
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: created
+              examples:
+                example-1:
+                  value:
+                    msg: created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    minLength: 1
+                required:
+                  - msg
+                x-examples:
+                  example-1:
+                    msg: created
+              examples:
+                email_exists:
+                  value:
+                    msg: email already exists
+        '500':
+          description: Internal Server Error
+      description: create a new user in the database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                email:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+              required:
+                - name
+                - email
+                - password
+              x-examples:
+                example-1:
+                  name: Rhea Singh
+                  email: rhea@test.com
+                  password: anhatsingh
+            examples:
+              example-1:
+                value:
+                  name: Anhat Singh
+                  email: anhat@test.com
+                  password: anhatsingh
 components:
   schemas: {}
   securitySchemes:

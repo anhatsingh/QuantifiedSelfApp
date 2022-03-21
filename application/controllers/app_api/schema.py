@@ -1,5 +1,26 @@
 allowed_choices = ['ms', 'integer', 'float']
 
+register_user_schema = {
+    "type": "object",
+    "properties": {
+        "name": { 
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 55
+            },
+        "email": {
+            "type": "string",
+            "maxLength": 55
+            },
+        "password": {
+            "type": "string", 
+            "minLength": 5,
+            "maxLength": 100
+            },
+    },
+    "required": ["name", "email", "password"]
+}
+
 add_tracker_schema = {
     "type": "object",
     "properties": {
