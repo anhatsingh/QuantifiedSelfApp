@@ -52,17 +52,16 @@
                 {% endif %}
             {% elif edit_mode %}
                 {% if tracker['type'] != '' %}
-                    <option value="{{tracker['type']}}" selected hidden>{% if tracker['type'] == 'ms' %}Multi-Select Choices{% elif tracker['type'] == 'float' %}Numerical (Decimal){% else %}Numerical (integer){% endif %}</option>
+                    <option value="{{tracker['type']}}" selected hidden>{% if tracker['type'] == 'ms' %}Multi-Select Choices{% elif tracker['type'] == 'float' %}Numerical (Decimal){% elif tracker['type'] == 'timerange' %}Time Range{% else %}Numerical (integer){% endif %}</option>
                 {% endif %}
             {% endif %}
             <option value="integer">Numerical (integer)</option>
             <option value="float">Numerical (Decimal)</option>
             <option value="ms">Multi-Select Choices</option>
+            <option value="timerange">Time Range</option>
         </select>
         {% if edit_mode %}<small id="trackerDescriptionHelp" class="form-text text-muted"><p style="color:red;">WARNING! Changing this will delete all the logged items of this tracker</p></small>{% endif %}
     </div>
-
-
 
     <!--{% if edit_mode and tracker['type'] == 'ms' %}
     {% for i in tracker['choices'] %}

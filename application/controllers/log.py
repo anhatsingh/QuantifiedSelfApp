@@ -43,6 +43,14 @@ def lvalue_check(form, field):
                     float(field.data)
                 except:
                     raise ValidationError('Numerical Value Field must be Float')
+            elif datatype == 'timerange':
+                try:
+                    start,end = field.data.strip().split('-')
+                    datetime.strptime(start.strip(), "%m/%d/%Y %I:%M %p")
+                    datetime.strptime(end.strip(), "%m/%d/%Y %I:%M %p")
+                except:
+                    raise ValidationError('Invalid Timerange sent')
+
 
 class Add_Log_Form(FlaskForm):
     ldate = DateTimeField('Timestamp', format=date_format, validators=[InputRequired()])
@@ -108,7 +116,7 @@ def add_tracker_log(id):
                         db.session.commit()
                     
                     else:
-                        x = Tracker_log_value(log_id = log.id, value = int(request.form['lvalue']) if data['type'] == 'integer' else float(request.form['lvalue']))
+                        x = Tracker_log_value(log_id = log.id, value = int(request.form['lvalue']) if data['type'] == 'integer' else (float(request.form['lvalue']) if data['type'] == 'float' else str(request.form['lvalue'])))
                         db.session.add(x)
                         db.session.commit()
                 except:

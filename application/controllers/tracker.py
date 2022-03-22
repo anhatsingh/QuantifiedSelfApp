@@ -15,7 +15,7 @@ import collections
 
 # ===============================================TRACKER VALIDATION==========================================================
 
-form_tracker_types = ['ms', 'integer', 'float']
+form_tracker_types = ['ms', 'integer', 'float', 'timerange']
 
 def check_tid(form, field):
     tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=form.tid.data).one_or_none()
@@ -77,12 +77,7 @@ def add_tracker():
                     db.session.add(new_choice)
             
             # if tracker type is integer values
-            elif ttype == 'integer':
-                new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = None)
-                db.session.add(new_choice)
-            
-            # if tracker type is float values
-            elif ttype == 'float':
+            else:
                 new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = None)
                 db.session.add(new_choice)
 
@@ -184,12 +179,7 @@ def edit_tracker(id):
                                 db.session.add(new_choice)
                         
                         # if tracker type is integer values
-                        elif ttype == 'integer':
-                            new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = None)
-                            db.session.add(new_choice)
-                        
-                        # if tracker type is float values
-                        elif ttype == 'float':
+                        else:
                             new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = None)
                             db.session.add(new_choice)
                     
@@ -283,7 +273,10 @@ def show_tracker_log(id, period):
             'choices': {i.id: (i.value.strip() if i.value else '') for i in tracker_data.ttype}
         }
         log_data = []
-        chart_data = {}
+        if tdata['type'] != 'timerange':
+            chart_data = {}
+        else:
+            chart_data = []
         for i in tracker_data.values:
             this_data = {
                 'id': i.id,
@@ -301,7 +294,7 @@ def show_tracker_log(id, period):
                     else:
                         chart_data[i] = this_data['value'].count(i)
             
-            else:
+            elif tdata['type'] in ['integer', 'float']:
                 include = False
                 difference_in_time = datetime.today() - this_data['timestamp']
                 if period == 'w' and difference_in_time.days <= 7:
@@ -322,8 +315,18 @@ def show_tracker_log(id, period):
                         chart_data[ts] += int("".join(this_data['value'])) if tdata['type'] == 'integer' else float("".join(this_data['value']))
                     else:
                         chart_data[ts] = int("".join(this_data['value'])) if tdata['type'] == 'integer' else float("".join(this_data['value']))
+            
+            else:
+                theTime = ("".join(this_data['value'])).split('-')
+                timeData = {
+                    "id": this_data['id'],
+                    "note": this_data['note'],
+                    "start": theTime[0].strip(),
+                    "end" : theTime[1].strip() 
+                }
+                chart_data.append(timeData)
 
-        if tdata['type'] != 'ms':
+        if tdata['type'] in ['integer', 'float']:
             if period == 'w':
                 delta = 7
                 for i in range(delta):
@@ -343,7 +346,7 @@ def show_tracker_log(id, period):
                     if key not in chart_data:
                         chart_data[key] = 0
         log_data = sorted(log_data, key=lambda d: d['timestamp'],reverse=True)
-        return render_template('tracker/show.html', title=f"Logs {tdata['name']}", tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())))
+        return render_template('tracker/show.html', title=f"Logs {tdata['name']}", tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())) if tdata['type'] != 'timerange' else chart_data )
 
 
 # =========================================================================================================================

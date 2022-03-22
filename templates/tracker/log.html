@@ -34,10 +34,10 @@
         <input id="ldate" class="form-control" name="ldate" required type="text" value="{% if retry %}{{form.ldate.data.strftime(date_format)}}{% elif edit_mode %}{{log['timestamp']}}{% endif %}">
     </div>
 
-{% if (tracker['type'] == 'integer' or tracker['type'] == 'float') %}
+{% if (tracker['type'] in ['integer', 'float', 'timerange']) %}
 <div class="form-group">
-    <label for="lvalue">{% if tracker['type'] == 'float' %}Numerical Value (Decimal){% else %}Numerical Value (integer){% endif %}</label>
-    <input id="lvalue" name="lvalue" class="form-control" placeholder="Example: 34, 567.64" required minlength="1" type="text" value="{% if retry %}{{form.lvalue.data}}{% elif edit_mode %}{{log['value'][0]}}{% endif %}">
+    <label for="lvalue">{% if tracker['type'] == 'float' %}Numerical Value (Decimal){% elif tracker['type'] == 'integer' %}Numerical Value (integer){% else %}Time Range{% endif %}</label>
+    <input id="lvalue" name="lvalue" class="form-control" required minlength="1" type="text" value="{% if retry %}{{form.lvalue.data}}{% elif edit_mode %}{{log['value'][0]}}{% endif %}">
 </div>
 {% elif (tracker['type'] == 'ms') %}
     <div class="form-group">
@@ -81,6 +81,19 @@
             document.getElementById('ldate').value = new Date().toLocaleString();
         }
     }
+
+    {% if tracker['type'] == 'timerange' %}
+    $(function() {
+        $('input[name="lvalue"]').daterangepicker({
+          timePicker: true,
+          startDate: moment().startOf('hour'),
+          endDate: moment().startOf('hour').add(32, 'hour'),
+          locale: {
+            format: 'M/DD/YYYY hh:mm A'
+          }
+        });
+      });
+    {% endif %}
 </script>
 
 {% with title=title %}{% include "footer.html" %}{% endwith %}
