@@ -23,6 +23,7 @@
 <table class="table table-bordered display nowrap dataTable dtr-inline collapsed" id="logsTable">
     <thead class="thead-dark">
         <tr>
+            <th>Sr. No</th>
             <th>Date-Time</th>
             <th>Value</th>
             <th>Note</th>
@@ -32,6 +33,7 @@
     <tbody>
         {% for log in logs %}
         <tr>
+            <td>{{loop.index}}</td>
             <td>{{log['timestamp'].strftime("%I:%M:%S %p, %B %d, %Y")}}</td>
             <td>{% for i in log['value'] %}{{i}}<br>{% endfor %}</td>
             <td>{{log['note']}}</td>
@@ -53,7 +55,7 @@
 </div>
 <div class="col col-4">
     <div class="container">
-        {% if tracker['type'] in ['integer', 'float'] %}
+        {% if tracker['type'] in ['integer', 'float', 'timerange'] %}
         <div class="row border csidebarfirst">
             <div class="row justify-content-md-center"><h4 class="page-head">Period</h4></div>
             <div class="form-group">
@@ -66,7 +68,7 @@
             </div>            
         </div>
         {% endif %}
-        <div class="row border {% if tracker['type'] not in ['integer', 'float'] %}csidebarfirst{% else %}csidebar{% endif %}">
+        <div class="row border {% if tracker['type'] not in ['integer', 'float', 'timerange'] %}csidebarfirst{% else %}csidebar{% endif %}">
             <div class="row justify-content-md-center"><h4 class="page-head">Tracker information</h4></div>
             <table class="table table-borderless">
                 <tr>
@@ -95,6 +97,11 @@
                         <a href="/tracker/{{tracker['id']}}/edit"><button type="button card-link" class="btn btn-sm btn-outline-info">Edit</button></a>
                         <a href="/tracker/{{tracker['id']}}/delete"><button type="button card-link" class="btn btn-sm btn-outline-danger">Delete</a></button></a></td>
                 </tr>
+                <tr>
+                    <td>Extra</td>                    
+                    <td><a href="/tracker/{{tracker['id']}}/autolog/{% if tracker['type'] == 'timerange' %}25{% else %}200{% endif %}"><button type="button card-link" class="btn btn-sm btn-warning">Autogen Values</a></button></a>
+                        <a href="/tracker/{{tracker['id']}}/logs/delete_all"><button type="button card-link" class="btn btn-sm btn-danger">Delete All Logs</a></button></a></td>
+                </tr>
             </table>
         </div>
 </div>
@@ -120,7 +127,7 @@
         {% endif %}
     }
     
-    {% if tracker['type'] in ['integer', 'float'] %}
+    {% if tracker['type'] in ['integer', 'float', 'timerange'] %}
     const period = document.getElementById('period')
     period.onchange = function(){
         window.location = '/tracker/' + period.dataset.id + '/show/' + period.value
@@ -137,7 +144,7 @@
 
     $(document).ready( function () {
         $('#logsTable').DataTable( {
-            "order": [[ 0, 'desc']],
+            "order": [[ 0, 'asc']],
             buttons: [
                 { 
                     extend: 'copy',

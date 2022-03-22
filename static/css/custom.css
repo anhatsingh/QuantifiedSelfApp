@@ -71,3 +71,14 @@ svg { width: 100%; }
 .table-borderless > thead > tr > th {
     border: none;
 }
+
+
+.login-form{
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.page-top-box{
+    margin-top: 50px;
+}

@@ -1,4 +1,4 @@
-allowed_choices = ['ms', 'integer', 'float']
+allowed_choices = ['ms', 'integer', 'float', 'timerange']
 
 register_user_schema = {
     "type": "object",
@@ -103,7 +103,7 @@ add_logs_schema = {
             "maxLength": 255
             },
         "value": {
-            "type": ["array", "number"], 
+            "type": ["array", "number", "string"], 
             "items": {
                 "type": "integer"
                 }
@@ -123,7 +123,7 @@ patch_logs_schema = {
             "maxLength": 255
             },
         "value": {
-            "type": ["array", "number"], 
+            "type": ["array", "number", "string"], 
             "items": {
                 "type": "integer"
                 }
@@ -135,3 +135,5 @@ patch_logs_schema = {
 
 # based on date we get from JavaScript, DO NOT CHANGE
 date_format = '%m/%d/%Y, %I:%M:%S %p'
+
+timerange_format = '%m/%d/%Y %I:%M %p'

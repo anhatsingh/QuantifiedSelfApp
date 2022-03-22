@@ -57,6 +57,7 @@ from application.controllers.default import *
 from application.controllers.tracker import *
 # import controllers related to logging of trackers
 from application.controllers.log import *
+from application.controllers.autologger import *
 
 
 from application.controllers.app_api.schema import *

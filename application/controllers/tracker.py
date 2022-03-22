@@ -16,6 +16,7 @@ import collections
 # ===============================================TRACKER VALIDATION==========================================================
 
 form_tracker_types = ['ms', 'integer', 'float', 'timerange']
+timerange_format = '%m/%d/%Y %I:%M %p'
 
 def check_tid(form, field):
     tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=form.tid.data).one_or_none()
@@ -288,11 +289,11 @@ def show_tracker_log(id, period):
 
             if tdata['type'] == 'ms':                
                 options = list(set(this_data['value']))
-                for i in options:
-                    if i in chart_data:
-                        chart_data[i] += this_data['value'].count(i)
+                for x in options:
+                    if x in chart_data:
+                        chart_data[x] += this_data['value'].count(x)
                     else:
-                        chart_data[i] = this_data['value'].count(i)
+                        chart_data[x] = this_data['value'].count(x)
             
             elif tdata['type'] in ['integer', 'float']:
                 include = False
@@ -318,13 +319,37 @@ def show_tracker_log(id, period):
             
             else:
                 theTime = ("".join(this_data['value'])).split('-')
+                start = theTime[0].strip()
+                end = theTime[1].strip()
+
+                difference_in_time = datetime.today() - datetime.strptime(start, timerange_format)
+                if period == 'w' and difference_in_time.days > 7:
+                    start = datetime.strftime(datetime.today() - timedelta(7), timerange_format)
+                elif period == 'm' and difference_in_time.days > 30:
+                    start = datetime.strftime(datetime.today() - timedelta(30), timerange_format)
+                elif period == 'd' and difference_in_time.days > 0:
+                    start = datetime.strftime(datetime.today(), timerange_format)
+                elif period == 'a':
+                    start = start
+                
+                endTimeDiff = datetime.today() - datetime.strptime(end, timerange_format)
+                if period == 'w' and endTimeDiff.days > 7:
+                    end = start
+                elif period == 'm' and endTimeDiff.days > 30:
+                    end = start
+                elif period == 'd' and endTimeDiff.days > 0:
+                    end = start
+                elif period == 'a':
+                    end = end
+
                 timeData = {
                     "id": this_data['id'],
                     "note": this_data['note'],
-                    "start": theTime[0].strip(),
-                    "end" : theTime[1].strip() 
+                    "start": start,
+                    "end" :  end
                 }
-                chart_data.append(timeData)
+                if start != end:
+                    chart_data.append(timeData)
 
         if tdata['type'] in ['integer', 'float']:
             if period == 'w':
@@ -350,3 +375,31 @@ def show_tracker_log(id, period):
 
 
 # =========================================================================================================================
+
+
+@app.route('/tracker/<int:tracker_id>/logs/delete_all', methods = ['GET'])
+@login_required
+def delete_all_tracker_logs(tracker_id):
+    # check if a tracker with the provided id and made by current user exists or not.
+    tracker_data = Tracker.query.filter_by(user_id=flask_login.current_user.id, id=tracker_id).one_or_none()
+    # if it exists, proceed.
+    if tracker_data:
+        all_log_data = Tracker_log.query.filter_by(tracker_id=tracker_data.id).all()
+        if all_log_data:
+            try:
+                for log_data in all_log_data:                                
+                    db.session.delete(log_data)
+                db.session.commit()
+            except:
+                app.logger.exception(f'Error ocurred while deleting tracker log with id {log_id}')
+                # if any internal error occurs, rollback the database
+                db.session.rollback()
+                flash('Internal error occurred, wasn\'t able to delete tracker log', 'error')
+                return redirect(url_for('home_page'))
+        
+            flash('Succesfully deleted all tracker logs', 'success')
+            return redirect(url_for('show_tracker_log', id=tracker_id))
+        else:
+            abort(404)
+    else:
+        abort(404)

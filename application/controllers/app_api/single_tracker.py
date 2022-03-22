@@ -118,7 +118,7 @@ class Each_Tracker_api(Resource):
                         return show_400('choices can\'t be empty if changing type to multi-select')
                 
                 # if tracker type is integer values
-                elif (ttype == 'integer' or ttype == 'float'):
+                else:
                     new_choice = Tracker_type(tracker_id  = tracker_data.id, datatype = ttype, value = None)
                     db.session.add(new_choice)
             

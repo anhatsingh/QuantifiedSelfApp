@@ -34,7 +34,8 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
+    
+    {% if current_user.is_authenticated %}
       {% set navigation_bar = [
         (url_for('home_page'), 'home', 'Home'),
         (url_for('add_tracker'), 'add_tracker', 'Add Tracker')
@@ -42,8 +43,10 @@
     {% if edit_mode and tracker %}
     {{ navigation_bar.append((url_for('show_tracker_log', id=tracker['id']), 'show_tracker', 'Show Tracker')) }}
     {% endif %}
-
+    
+    
     {{navigation_bar.append(('/logout', 'logout', 'Logout'))}}
+    {% endif %}
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <div class="col-9"></div>

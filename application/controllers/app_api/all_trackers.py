@@ -49,7 +49,7 @@ class Trackers_api(Resource):
         tracker_input_args.add_argument('name')
         tracker_input_args.add_argument('description')
         tracker_input_args.add_argument('settings', type=str, action='append')
-        tracker_input_args.add_argument('type')
+        tracker_input_args.add_argument('type', choices=allowed_choices)
         tracker_input_args.add_argument('choices', type=str, action='append')
 
         args = tracker_input_args.parse_args()
@@ -85,12 +85,7 @@ class Trackers_api(Resource):
                     db.session.add(new_choice)
             
             # if tracker type is integer values
-            elif ttype == 'integer':
-                new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = None)
-                db.session.add(new_choice)
-            
-            # if tracker type is float values
-            elif ttype == 'float':
+            else:
                 new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = None)
                 db.session.add(new_choice)
 

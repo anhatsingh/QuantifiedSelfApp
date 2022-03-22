@@ -5,8 +5,6 @@ info:
   description: This api is made by Anhat Singh to access QuantifiedSelf App with the help of API access.
   contact:
     name: Anhat Singh
-    url: anhatsingh.com
-    email: anhatsingh2001@gmail.com
 servers:
   - url: 'http://127.0.0.1:5000'
     description: localhost
@@ -244,6 +242,7 @@ paths:
                     description:
                       type: string
                       minLength: 1
+                      nullable: true
                     type:
                       type: string
                       minLength: 1
@@ -513,6 +512,7 @@ paths:
                   description:
                     type: string
                     minLength: 1
+                    nullable: true
                   type:
                     type: string
                     minLength: 1
@@ -909,6 +909,7 @@ paths:
                     value:
                       oneOf:
                         - type: array
+                          items: {}
                         - type: number
                       uniqueItems: true
                       minItems: 1
@@ -923,11 +924,16 @@ paths:
                         required:
                           - choice_id
                           - choice_name
+                    start:
+                      type: string
+                      description: Time range start value if tracker is timerange
+                    end:
+                      type: string
+                      description: Time range end value if tracker is timerange
                   required:
                     - id
                     - timestamp
                     - note
-                    - value
               examples:
                 multi-select:
                   value:
@@ -981,6 +987,18 @@ paths:
                       timestamp: '03/18/2022, 01:07:56 PM'
                       note: 'I have run 50km, more than possible.'
                       value: 50
+                timerange:
+                  value:
+                    - id: 49
+                      timestamp: '03/22/2022, 05:27:27 AM'
+                      note: val1
+                      start: '3/01/2022 05:00 AM'
+                      end: '3/30/2022 01:00 PM'
+                    - id: 50
+                      timestamp: '03/22/2022, 05:27:47 AM'
+                      note: val2
+                      start: '4/01/2022 05:00 AM'
+                      end: '4/30/2022 01:00 PM'
         '401':
           description: Unauthorized; Token has not been created/expired.
         '403':
@@ -1146,7 +1164,15 @@ paths:
                 value:
                   oneOf:
                     - type: array
+                      description: choice id to mark checked
+                      items:
+                        type: integer
                     - type: number
+                      description: value in case of integer or float datatypes
+                    - type: string
+                      properties: {}
+                      description: 'Time in format "01/21/2022, 09:24 AM - 01/21/2022, 09:55 AM" in case of timerange'
+                      format: date-time
                   description: 'If tracker is not multi-select, value takes integer/float figures. If it is multi-select, value takes an array of choices to mark ticked among choices registered under this tracker.'
                   items:
                     type: number
@@ -1192,9 +1218,11 @@ paths:
                   note:
                     type: string
                     minLength: 1
+                    nullable: true
                   value:
                     oneOf:
                       - type: array
+                        items: {}
                       - type: number
                     uniqueItems: true
                     minItems: 1
@@ -1209,11 +1237,16 @@ paths:
                       required:
                         - choice_id
                         - choice_name
+                  start:
+                    type: string
+                    description: start value if tracker type is timerange
+                  end:
+                    type: string
+                    description: end value if tracker type is timerange
                 required:
                   - id
                   - timestamp
                   - note
-                  - value
               examples:
                 with choices:
                   value:
@@ -1229,6 +1262,13 @@ paths:
                     timestamp: '03/18/2022, 01:07:56 PM'
                     note: 'I have run 50km, more than possible.'
                     value: 50
+                timerange:
+                  value:
+                    id: 60
+                    timestamp: '03/22/2022, 11:50:01 AM'
+                    note: null
+                    start: '01/21/2022, 09:24 AM'
+                    end: '03/21/2022, 10:59 AM'
         '401':
           description: Unauthorized; Token has not been created/expired.
         '403':
@@ -1464,7 +1504,14 @@ paths:
                 value:
                   oneOf:
                     - type: array
+                      description: 'in case of choices, put ids in array'
+                      items:
+                        type: integer
                     - type: number
+                      description: in case of integer/float datatype
+                    - type: string
+                      properties: {}
+                      description: in case of timerange
                   description: |-
                     If multi-select type of tracker is there, value is an array of id of choices to be marked ticked.
                     If other type, number is taken as input to store into the database.
@@ -1487,6 +1534,9 @@ paths:
                   timestamp: '01/10/1999, 01:10:59 AM'
                   note: blah blah blah
                   value: 24.56
+              timerange:
+                value:
+                  value: '01/21/2022, 09:24 AM - 01/21/2022, 11:24 AM'
   /api/register:
     post:
       summary: ''

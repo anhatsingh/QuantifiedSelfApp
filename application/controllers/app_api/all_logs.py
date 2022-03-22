@@ -49,6 +49,10 @@ class Logs_api(Resource):
                         elif tdata['type'] == 'float':
                             ldata['value'] = float(log_data.values[0].value)
                         
+                        elif tdata['type'] == 'timerange':
+                            temp = str(log_data.values[0].value).split('-')
+                            ldata['start'], ldata['end'] = temp[0].strip(), temp[1].strip()
+                        
                         final_data.append(ldata)
                     
                     return make_response(jsonify(final_data), 200)
@@ -80,12 +84,12 @@ class Logs_api(Resource):
             logs_input_args = reqparse.RequestParser()
             logs_input_args.add_argument('timestamp')
             logs_input_args.add_argument('note')
-            logs_input_args.add_argument('value', type=(int if (data['type'] in ['integer', 'ms']) else float), action='append')
+            logs_input_args.add_argument('value', type=(int if (data['type'] in ['integer', 'ms']) else (float if data['type'] == 'float' else str)), action='append')
 
             args = logs_input_args.parse_args()
             timestamp = args.get('timestamp', None)
             note = args.get('note', None)
-            values = args.get('value', None)
+            values = args.get('value', None)            
 
             if timestamp == None:
                 timestamp = datetime.strftime(datetime.now(), date_format)
@@ -105,6 +109,14 @@ class Logs_api(Resource):
                 for i in values:
                     if i not in data['choices']:
                         return show_400(f"choice id {i} does not exist")
+            
+            elif data['type'] == 'timerange':
+                try:
+                    temp = str(values[0]).split('-')
+                    datetime.strptime(temp[0].strip(), timerange_format)
+                    datetime.strptime(temp[1].strip(), timerange_format)
+                except:
+                    return show_400(f'Value is not in valid format, should be in the format \'{datetime.strftime(datetime.now(), timerange_format)} - {datetime.strftime(datetime.now(), timerange_format)}\'')
 
             try:
                 log = Tracker_log(tracker_id = tracker_data.id, note = note, timestamp = datetime.strptime(timestamp, date_format))
@@ -117,7 +129,7 @@ class Logs_api(Resource):
                         x = Tracker_log_value(log_id = log.id, value = i)
                         db.session.add(x)                
                 else:
-                    x = Tracker_log_value(log_id = log.id, value = int(values[0]) if data['type'] == 'integer' else float(values[0]))
+                    x = Tracker_log_value(log_id = log.id, value = int(values[0]) if data['type'] == 'integer' else (float(values[0]) if data['type'] == 'float' else str(values[0])))
                     db.session.add(x)
 
                 db.session.commit()

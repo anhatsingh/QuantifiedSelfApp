@@ -45,7 +45,11 @@ class Each_Log_api(Resource):
                         ldata['value'] = int(log_data.values[0].value)
                     
                     elif tdata['type'] == 'float':
-                        ldata['value'] = float(log_data.values[0].value)                                                
+                        ldata['value'] = float(log_data.values[0].value)
+                    
+                    elif tdata['type'] == 'timerange':
+                        temp = str(log_data.values[0].value).split('-')
+                        ldata['start'], ldata['end'] = temp[0].strip(), temp[1].strip()
                     
                     return make_response(jsonify(ldata), 200)
                 else:
@@ -110,7 +114,7 @@ class Each_Log_api(Resource):
                 logs_patch_args = reqparse.RequestParser()
                 logs_patch_args.add_argument('timestamp')
                 logs_patch_args.add_argument('note')
-                logs_patch_args.add_argument('value', type=(int if (tdata['type'] in ['integer', 'ms']) else float), action='append')
+                logs_patch_args.add_argument('value', type=(int if (tdata['type'] in ['integer', 'ms']) else (float if tdata['type']=='float' else str)), action='append')
 
                 args = logs_patch_args.parse_args()
                 timestamp = args.get('timestamp', None)
@@ -136,6 +140,14 @@ class Each_Log_api(Resource):
                         for i in values:
                             if i not in tdata['choices']:
                                 return show_400(f"choice id {i} does not exist")
+                    
+                    elif tdata['type'] == 'timerange':
+                        try:
+                            temp = str(values[0]).split('-')
+                            datetime.strptime(temp[0].strip(), timerange_format)
+                            datetime.strptime(temp[1].strip(), timerange_format)
+                        except:
+                            return show_400(f'Value is not in valid format, should be in the format \'{datetime.strftime(datetime.now(), timerange_format)} - {datetime.strftime(datetime.now(), timerange_format)}\'')
 
                 try:
                     log_data.timestamp = datetime.strptime(timestamp, date_format)
