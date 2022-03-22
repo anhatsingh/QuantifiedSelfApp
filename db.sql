@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS tracker_logs;
 DROP TABLE IF EXISTS tracker_type;
 DROP TABLE IF EXISTS tracker;
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS website_data;
 
 CREATE TABLE role (
 	id integer PRIMARY KEY,

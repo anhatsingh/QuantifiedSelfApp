@@ -171,6 +171,9 @@ def edit_tracker(id):
                     if oldtype != ttype:
                         for i in tracker_data.ttype:
                             db.session.delete(i)
+                        old_logs = Tracker_log.query.filter_by(tracker_id = tracker_data.id).all()
+                        for ol in old_logs:
+                            db.session.delete(ol)
                         # if tracker type is multiple select
                         if ttype == 'ms':
                             # get all the choices splitted across the \n
@@ -205,6 +208,15 @@ def edit_tracker(id):
                             
                             if len(old_ids) > 0:
                                 for o in old_ids:
+                                    tlogs = Tracker_log.query.filter_by(tracker_id=tracker_data.id).all()
+                                    logIDs = [i.id for i in tlogs]
+
+                                    old_vals = Tracker_log_value.query.filter_by(value=o).all()
+                                    for ol in old_vals:
+                                        if ol.log_id in logIDs:
+                                            tlogs_single = Tracker_log.query.filter_by(id=ol.log_id).one_or_none()
+                                            db.session.delete(tlogs_single)
+
                                     choice_from_db = Tracker_type.query.filter_by(id=o).one_or_none()
                                     db.session.delete(choice_from_db)
                     
@@ -219,7 +231,7 @@ def edit_tracker(id):
                     return redirect(url_for('edit_tracker', id=id))
                 
                 flash('Succesfully updated tracker info', 'success')
-                return redirect(url_for('home_page'))
+                return redirect(url_for('show_tracker_log', id=tracker_data.id))
             else:
                 abort(404)
     else:
@@ -256,7 +268,7 @@ def delete_tracker(id):
 # =========================================================================================================================
 
 # =================================================SHOW TRACKER INFO=======================================================
-@app.route('/tracker/<int:id>/show', methods = ['GET', 'POST'], defaults= {'period': 'w'})
+@app.route('/tracker/<int:id>/show', methods = ['GET', 'POST'], defaults= {'period': 'm'})
 @app.route('/tracker/<int:id>/show/<string:period>', methods = ['GET', 'POST'])
 @login_required
 def show_tracker_log(id, period):

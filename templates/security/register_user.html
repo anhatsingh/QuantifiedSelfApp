@@ -14,6 +14,14 @@
             </div>
             <!--<hr class="my-4">-->
             </div>
+            {% if form %}
+            {% for field, errors in form.errors.items() %}
+            <div class="alert alert-danger alert-dismissible fade show highest-index" role="alert">
+                <h4 class="alert-heading">Vaidation Error</h4> {{ form[field].label }}: {{ ', '.join(errors) }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+            {% endif %}
     <form action="/register" method="POST" name="register_user_form">
         <input id="next" name="next" type="hidden" value="/">
 
