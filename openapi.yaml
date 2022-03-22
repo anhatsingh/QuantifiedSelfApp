@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: QuantifiedSelf API
-  version: '1.4'
+  version: '1.2'
   description: This api is made by Anhat Singh to access QuantifiedSelf App with the help of API access.
   contact:
     name: Anhat Singh
@@ -22,18 +22,22 @@ paths:
               schema:
                 description: ''
                 type: object
+                x-examples:
+                  example-1:
+                    access_token: hsjjgdfwydgf
                 properties:
                   access_token:
                     type: string
                     minLength: 1
+                  name:
+                    type: string
                 required:
                   - access_token
-                x-examples:
-                  example-1:
-                    access_token: hsjjgdfwydgf
+                  - name
               examples:
                 example-1:
                   value:
+                    name: user1
                     access_token: string
         '400':
           description: Bad Request; including validation errors
