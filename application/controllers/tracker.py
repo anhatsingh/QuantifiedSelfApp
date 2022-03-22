@@ -9,7 +9,8 @@ from wtforms.validators import InputRequired, Length, AnyOf, ValidationError
 from application.models import *
 from datetime import datetime, timedelta
 import collections
-
+import numpy as np
+from scipy import stats
 
 # TODO Multi-Language support
 
@@ -278,6 +279,8 @@ def show_tracker_log(id, period):
             chart_data = {}
         else:
             chart_data = []
+        
+        all_values = []
         for i in tracker_data.values:
             this_data = {
                 'id': i.id,
@@ -296,6 +299,7 @@ def show_tracker_log(id, period):
                         chart_data[x] = this_data['value'].count(x)
             
             elif tdata['type'] in ['integer', 'float']:
+                all_values.append(int("".join(this_data['value'])) if tdata['type'] == 'integer' else float("".join(this_data['value'])))
                 include = False
                 difference_in_time = datetime.today() - this_data['timestamp']
                 if period == 'w' and difference_in_time.days <= 7:
@@ -371,7 +375,15 @@ def show_tracker_log(id, period):
                     if key not in chart_data:
                         chart_data[key] = 0
         log_data = sorted(log_data, key=lambda d: d['timestamp'],reverse=True)
-        return render_template('tracker/show.html', title=f"Logs {tdata['name']}", tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())) if tdata['type'] != 'timerange' else chart_data )
+        extra = {}
+        if tdata['type'] in ['integer', 'float']:
+            extra['mean'] = np.mean(all_values)
+            extra['median'] = np.median(all_values)
+            extra['mode'] = stats.mode(all_values)
+            extra['25th'] = np.percentile(all_values, 25)
+            extra['75th'] = np.percentile(all_values, 75)
+        
+        return render_template('tracker/show.html', extra=extra, title=f"Logs {tdata['name']}", tracker = tdata, logs = log_data, period = period, total=len(tracker_data.values), chart=collections.OrderedDict(sorted(chart_data.items())) if tdata['type'] != 'timerange' else chart_data )
 
 
 # =========================================================================================================================
@@ -391,7 +403,7 @@ def delete_all_tracker_logs(tracker_id):
                     db.session.delete(log_data)
                 db.session.commit()
             except:
-                app.logger.exception(f'Error ocurred while deleting tracker log with id {log_id}')
+                app.logger.exception(f'Error ocurred while deleting all logs')
                 # if any internal error occurs, rollback the database
                 db.session.rollback()
                 flash('Internal error occurred, wasn\'t able to delete tracker log', 'error')

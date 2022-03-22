@@ -67,6 +67,7 @@ from application.controllers.app_api.single_tracker import *
 from application.controllers.app_api.all_trackers import *
 from application.controllers.app_api.all_logs import *
 from application.controllers.app_api.single_log import *
+from application.controllers.app_api.stats import *
 
 # import error handling controllers
 from application.controllers.error_handlers import *

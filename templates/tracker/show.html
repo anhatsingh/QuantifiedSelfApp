@@ -68,6 +68,35 @@
             </div>            
         </div>
         {% endif %}
+        {% if tracker['type'] in ['integer', 'float'] %}
+        <div class="row border csidebar">
+            <div class="row justify-content-md-center"><h4 class="page-head">Statistics</h4></div>
+            <div class="form-group">
+                <table class="table table-borderless">
+                    <tr>
+                        <td>Mean</td>
+                        <td>{{extra['mean']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Median</td>
+                        <td>{{extra['median']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Mode</td>
+                        <td>{% if extra['mode'].count > 1 %}{{extra['mode']}}{% else %}None{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>25th Percentile</td>
+                        <td>{{extra['25th']}}</td>
+                    </tr>
+                    <tr>
+                        <td>75th Percentile</td>
+                        <td>{{extra['75th']}}</td>
+                    </tr>
+                </table>
+            </div>            
+        </div>
+        {% endif %}
         <div class="row border {% if tracker['type'] not in ['integer', 'float', 'timerange'] %}csidebarfirst{% else %}csidebar{% endif %}">
             <div class="row justify-content-md-center"><h4 class="page-head">Tracker information</h4></div>
             <table class="table table-borderless">
@@ -99,8 +128,16 @@
                 </tr>
                 <tr>
                     <td>Extra</td>                    
-                    <td><a href="/tracker/{{tracker['id']}}/autolog/{% if tracker['type'] == 'timerange' %}25{% else %}200{% endif %}"><button type="button card-link" class="btn btn-sm btn-warning">Autogen Values</a></button></a>
-                        <a href="/tracker/{{tracker['id']}}/logs/delete_all"><button type="button card-link" class="btn btn-sm btn-danger">Delete All Logs</a></button></a></td>
+                    <td><div class="btn-group" role="group" aria-label="Button group with nested dropdown">              
+                        <div class="btn-group" role="group">
+                          <button id="btnGroupDrop1" type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action</button>
+                          <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                            <li><a class="dropdown-item" href="/tracker/{{tracker['id']}}/autolog/{% if tracker['type'] == 'timerange' %}25{% else %}200{% endif %}">Autogen Values</a></li>
+                            <li><a class="dropdown-item" href="/tracker/{{tracker['id']}}/logs/delete_all">Delete All Logs</a></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </td>
                 </tr>
             </table>
         </div>
