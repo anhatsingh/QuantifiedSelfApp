@@ -20,7 +20,7 @@ def login():
 
         if user and verify_password(password, user.password):
             access_token = create_access_token(identity=user.id)
-            return jsonify(token=access_token), 200
+            return jsonify(name=user.username, token=access_token), 200
         
         return jsonify({"msg": "Bad username or password"}), 401
     except:

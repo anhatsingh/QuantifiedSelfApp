@@ -83,7 +83,7 @@
                     </tr>
                     <tr>
                         <td>Mode</td>
-                        <td>{% if extra['mode'].count > 1 %}{{extra['mode']}}{% else %}None{% endif %}</td>
+                        <td>{% if extra['mode'] != None %}{% if extra['mode'].count > 1 %}{{extra['mode'].mode[0]}}{% else %}None{% endif %}{% else %}None{% endif %}</td>
                     </tr>
                     <tr>
                         <td>25th Percentile</td>

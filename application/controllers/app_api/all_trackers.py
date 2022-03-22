@@ -79,10 +79,14 @@ class Trackers_api(Resource):
 
             # if tracker type is multiple select
             if ttype == 'ms':
-                # add each choice to the database
-                for i in choices:
-                    new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i.strip())
-                    db.session.add(new_choice)
+                if choices != None:
+                    # add each choice to the database
+                    for i in choices:
+                        new_choice = Tracker_type(tracker_id  = new_tracker.id, datatype = ttype, value = i.strip())
+                        db.session.add(new_choice)
+                
+                else:
+                    return show_400("choices are required with this type of tracker.")
             
             # if tracker type is integer values
             else:

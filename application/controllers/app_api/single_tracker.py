@@ -108,6 +108,9 @@ class Each_Tracker_api(Resource):
             if oldtype != ttype:
                 for i in tracker_data.ttype:
                     db.session.delete(i)
+                old_logs = Tracker_log.query.filter_by(tracker_id = tracker_data.id).all()
+                for ol in old_logs:
+                    db.session.delete(ol)
                 # if tracker type is multiple select
                 if ttype == 'ms':
                     if choices != None:
