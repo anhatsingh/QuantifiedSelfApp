@@ -54,6 +54,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable = False)
     active = db.Column(db.Boolean(), nullable = False)
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+    datetime = db.Column(db.String(), default=func.now())
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'role'

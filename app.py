@@ -12,6 +12,7 @@ from wtforms.validators import DataRequired
 
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from datetime import datetime
 
 # set the configurations for the log file
 logging.basicConfig(filename='debug.log', level=logging.INFO, format='[%(levelname)s %(asctime)s %(name)s] ' + '%(message)s')
@@ -40,6 +41,7 @@ def create_app():
     class ExtendedRegisterForm(RegisterForm):
         # the additional field we are adding to the form, name of variable must be exactly same as database attribute.
         username = StringField('Full Name', [DataRequired()])
+        datetime = StringField('Time of Registration', [DataRequired()])
 
     # initialize the Flask-Security.
     user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)

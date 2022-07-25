@@ -280,7 +280,7 @@ def delete_tracker(id):
 # =========================================================================================================================
 
 # =================================================SHOW TRACKER INFO=======================================================
-@app.route('/tracker/<int:id>/show', methods = ['GET', 'POST'], defaults= {'period': 'm'})
+@app.route('/tracker/<int:id>/show', methods = ['GET', 'POST'], defaults= {'period': 'a'})
 @app.route('/tracker/<int:id>/show/<string:period>', methods = ['GET', 'POST'])
 @login_required
 def show_tracker_log(id, period):
