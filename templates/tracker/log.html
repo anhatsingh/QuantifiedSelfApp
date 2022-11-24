@@ -39,8 +39,7 @@
 <div class="form-group">
     <label for="lvalue">{% if tracker['type'] == 'float' %}Numerical Value (Decimal){% elif tracker['type'] == 'integer' %}Numerical Value (integer){% else %}Time Range{% endif %}</label>
     <input id="lvalue" name="lvalue" class="form-control" required minlength="1" type="text" value="{% if retry %}{{form.lvalue.data}}{% elif edit_mode %}{{log['value'][0]}}{% endif %}">
-    <small class="form-text text-muted">The value you want to log in {{tracker['type'] | title}} format.</small>
-    
+    <small class="form-text text-muted">The value you want to log in {{tracker['type'] | title}} format.</small> 
 </div>
 {% elif (tracker['type'] == 'ms') %}
     <div class="form-group">
